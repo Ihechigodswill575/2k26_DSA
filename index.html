@@ -602,19 +602,38 @@ setTimeout(()=>{
   setTimeout(()=>{document.getElementById('splash').style.display='none';checkAuth();},650);
 },3600);
 
+// ── FIX: checkAuth now has an error callback so Firebase auth failures
+//    don't leave the app stuck on the splash screen forever.
+//    loadCUD errors are caught here so showMain() always runs when logged in.
 function checkAuth(){
-  onAuthStateChanged(auth,async u=>{
-    if(u){CU=u;await loadCUD(u.uid);showMain();}
-    else showAuth();
+  onAuthStateChanged(auth, async u=>{
+    if(u){
+      CU=u;
+      try{await loadCUD(u.uid);}
+      catch(e){
+        console.error('loadCUD failed:',e);
+        CUD={name:CU.displayName||'User',pfp:'',username:'',statusText:''};
+        updateHeaderPfp();
+      }
+      showMain();
+    }else{
+      showAuth();
+    }
+  }, err=>{
+    // Firebase Auth itself errored (bad config, network, etc.)
+    console.error('Auth state error:',err);
+    showAuth();
   });
 }
+
+// ── FIX: loadCUD no longer swallows its own errors with a try/catch.
+//    Errors now bubble up to checkAuth which handles them safely.
 async function loadCUD(uid){
-  try{
-    const s=await getDoc(doc(db,'users',uid));
-    CUD=s.exists()?s.data():{name:CU.displayName||'User',pfp:'',username:'',statusText:''};
-    updateHeaderPfp();
-  }catch(e){console.error(e);}
+  const s=await getDoc(doc(db,'users',uid));
+  CUD=s.exists()?s.data():{name:CU.displayName||'User',pfp:'',username:'',statusText:''};
+  updateHeaderPfp();
 }
+
 function updateHeaderPfp(){
   const img=document.getElementById('header-pfp'), ph=document.getElementById('header-pfp-ph');
   if(CUD?.pfp){img.src=CUD.pfp;img.style.display='block';ph.style.display='none';}
@@ -677,7 +696,6 @@ window.doSignup=async function(){
   if(pass.length<6){showErr('su-err','Password min 6 characters.');return;}
   const btn=document.getElementById('su-btn'); btn.disabled=true; btn.textContent='Checking username...';
   try{
-    // Check username unique
     const uq=query(collection(db,'users'),where('username','==',username));
     const usnap=await getDocs(uq);
     if(!usnap.empty){showErr('su-err','Username already taken. Try another.');btn.disabled=false;btn.textContent='Create Account';return;}
@@ -689,7 +707,6 @@ window.doSignup=async function(){
       pfp:'', statusText:'Hey there! I am on 2k26_DSA',
       createdAt:serverTimestamp(), friends:[]
     });
-    // Try pfp upload after
     if(pendingPfpFile){
       btn.textContent='Uploading pic...';
       try{
@@ -767,7 +784,6 @@ window.findUser=async function(){
     if(snap.empty){document.getElementById('find-result').innerHTML='<p style="color:var(--text2);font-size:13px">No user found.</p>';return;}
     const u=snap.docs[0].data();
     const isFriend=(CUD?.friends||[]).includes(u.uid);
-    // Check if request already sent
     const reqSnap=await getDoc(doc(db,'requests',CU.uid+'_'+u.uid));
     const alreadySent=reqSnap.exists();
     document.getElementById('find-result').innerHTML=`
@@ -846,12 +862,9 @@ function renderRequests(reqs){
 
 window.acceptReq=async function(reqId,fromUid,fromName,fromPfp,fromUsername){
   try{
-    // Update request status
     await updateDoc(doc(db,'requests',reqId),{status:'accepted'});
-    // Add to friends both ways
     await updateDoc(doc(db,'users',CU.uid),{friends:arrayUnion(fromUid)});
     await updateDoc(doc(db,'users',fromUid),{friends:arrayUnion(CU.uid)});
-    // Create chat
     const cid=chatId(CU.uid,fromUid);
     await setDoc(doc(db,'chats',cid),{
       type:'private', members:[CU.uid,fromUid],
@@ -966,19 +979,22 @@ window.closeChat=function(){
 };
 
 // MESSAGES
+const _msgCache={};
+
 function loadMessages(cid){
   if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
   const q=query(collection(db,'chats',cid,'messages'),orderBy('timestamp','asc'));
   msgsUnsub=onSnapshot(q,snap=>{
-    const msgs=snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderMsgs(msgs);
-    // Check for tags
-    msgs.forEach(m=>{
-      if(m.senderId!==CU.uid&&m.tags&&m.tags.includes(CU.uid)&&!m._notified){
-        m._notified=true;
-        toast(`@${m.senderName} tagged you!`,3000,()=>{
-          document.getElementById('msg_'+m.id)?.scrollIntoView({behavior:'smooth',block:'center'});
-        });
+    snap.docs.forEach(d=>{_msgCache[d.id]={id:d.id,...d.data()};});
+    renderMsgs(snap.docs.map(d=>({id:d.id,...d.data()})));
+    snap.docChanges().forEach(change=>{
+      if(change.type==='added'){
+        const m={id:change.doc.id,...change.doc.data()};
+        if(m.senderId!==CU.uid&&m.tags?.includes(CU.uid)){
+          toast(`@${m.senderUsername||m.senderName} tagged you! 👆`,3500,()=>{
+            document.getElementById('msg_'+m.id)?.scrollIntoView({behavior:'smooth',block:'center'});
+          });
+        }
       }
     });
   });
@@ -989,7 +1005,6 @@ function renderMsgs(msgs){
   const atBot=c.scrollHeight-c.scrollTop-c.clientHeight<140;
   c.innerHTML=msgs.map(m=>renderMsg(m)).join('');
   if(atBot||msgs.length<=2)c.scrollTop=c.scrollHeight;
-  // Start edit timers display
   msgs.forEach(m=>{
     if(m.senderId===CU.uid&&!m.deleted&&m.timestamp){
       const sl=secsLeft(m.timestamp);
@@ -1032,7 +1047,6 @@ function renderMsg(m){
 }
 
 function formatText(txt){
-  // Tags
   txt=txt.replace(/@(\w+)/g,'<span class="tag-highlight">@$1</span>');
   return txt;
 }
@@ -1045,7 +1059,6 @@ window.sendMessage=async function(){
   if(!txt)return;
 
   if(editingMsgId){
-    // Save edit
     try{
       const mRef=doc(db,'chats',activeChatId,'messages',editingMsgId);
       const snap=await getDoc(mRef);
@@ -1057,11 +1070,9 @@ window.sendMessage=async function(){
     cancelEdit(); ta.value=''; autoResize(ta); return;
   }
 
-  // Detect tags
   const tagMatches=[...txt.matchAll(/@(\w+)/g)].map(m=>m[1]);
   let tags=[];
   if(tagMatches.length&&activeChatType==='group'){
-    // Resolve usernames to uids
     for(const uname of tagMatches){
       try{
         const q=query(collection(db,'users'),where('username','==',uname));
@@ -1165,7 +1176,6 @@ function stopRecTimer(){clearInterval(recTimer);recTimer=null;recSeconds=0;}
 window.showCtx=function(e,msgId){
   e.preventDefault();
   ctxMsgId=msgId;
-  // Load msg data from DOM
   const snap=_msgCache[msgId];
   ctxMsgData=snap;
   const menu=document.getElementById('msg-ctx-menu');
@@ -1180,12 +1190,6 @@ window.showCtx=function(e,msgId){
   menu.classList.add('show');
 };
 function hideCtxMenu(){document.getElementById('msg-ctx-menu').classList.remove('show');ctxMsgId=null;}
-
-// Cache for msg data
-const _msgCache={};
-// We'll populate this in renderMsgs by re-parsing — but better to intercept snapshot
-// Patch loadMessages to also cache
-const _origLoadMessages=loadMessages;
 
 window.showEmojiFromCtx=function(){
   if(!ctxMsgId)return;
@@ -1259,7 +1263,6 @@ window.handleInput=function(el){
 async function showTagSuggest(partial){
   if(!gcMembers.length)return;
   const sug=document.getElementById('tag-suggest');
-  // Get members data
   const matches=[];
   for(const uid of gcMembers){
     if(uid===CU.uid)continue;
@@ -1338,7 +1341,7 @@ window.addRuleInput=function(){
   document.getElementById('gc-rule-input').value='';
   document.getElementById('rules-preview').innerHTML=gcRulesArr.map((r,i)=>`<li class="rule-item">📌 ${esc(r)}<button onclick="removeRule(${i})">✕</button></li>`).join('');
 };
-window.removeRule=function(i){gcRulesArr.splice(i,1);window.addRuleInput.toString();document.getElementById('rules-preview').innerHTML=gcRulesArr.map((r,j)=>`<li class="rule-item">📌 ${esc(r)}<button onclick="removeRule(${j})">✕</button></li>`).join('');};
+window.removeRule=function(i){gcRulesArr.splice(i,1);document.getElementById('rules-preview').innerHTML=gcRulesArr.map((r,j)=>`<li class="rule-item">📌 ${esc(r)}<button onclick="removeRule(${j})">✕</button></li>`).join('');};
 
 window.createGroup=async function(){
   const name=document.getElementById('gc-name').value.trim();
@@ -1377,7 +1380,6 @@ window.openChatInfo=async function(){
       const d=snap.data()||{};
       title.textContent=d.name||'Group Info';
       const isAdmin=d.admins?.includes(CU.uid);
-
       const membersHtml=Object.entries(d.memberData||{}).map(([uid,m])=>`
         <div class="member-item">
           <div class="m-av">${m.pfp?`<img src="${m.pfp}"/>`:(m.name||'?')[0]}</div>
@@ -1385,9 +1387,7 @@ window.openChatInfo=async function(){
           ${d.admins?.includes(uid)?'<span class="badge">Admin</span>':''}
           ${isAdmin&&uid!==CU.uid?`<button onclick="adminRemoveMember('${uid}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px;padding:2px 6px">Remove</button>`:''}
         </div>`).join('');
-
       const rulesHtml=d.rules?.length?`<div style="margin-top:14px"><strong style="font-size:12px;color:var(--accent)">📋 Rules</strong><ul class="rules-list" style="margin-top:6px">${d.rules.map(r=>`<li class="rule-item">📌 ${esc(r)}</li>`).join('')}</ul></div>`:'';
-
       const adminTools=isAdmin?`
         <div style="margin-top:16px">
           <strong style="font-size:12px;color:var(--accent)">⚙️ Admin Tools</strong>
@@ -1400,7 +1400,6 @@ window.openChatInfo=async function(){
             <button class="ibtn" onclick="adminAddRule()" style="width:auto;padding:0 10px;border-radius:var(--radius-sm);font-size:12px">+</button>
           </div>
         </div>`:'';
-
       content.innerHTML=`<p style="font-size:12px;color:var(--text2);margin-bottom:12px">${esc(d.description||'')}</p><div class="members-list">${membersHtml}</div>${rulesHtml}${adminTools}`;
       footer.innerHTML=`
         <button class="btn btn-ghost" onclick="closeModal('chatinfo-overlay')">Close</button>
@@ -1434,7 +1433,6 @@ window.adminAddMember=async function(){
       members:arrayUnion(u.uid),
       [`memberData.${u.uid}`]:{name:u.name,pfp:u.pfp||'',username:u.username||''}
     });
-    // Notify new member
     await addDoc(collection(db,'notifications'),{
       to:u.uid, type:'added_to_group',
       groupName:activeChatData?.name||'a group',
@@ -1450,7 +1448,6 @@ window.adminRemoveMember=async function(uid){
   try{
     const udata=activeChatData?.memberData?.[uid]||{};
     await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(uid)});
-    // Notify removed user
     await addDoc(collection(db,'notifications'),{
       to:uid, type:'removed_from_group',
       groupName:activeChatData?.name||'a group',
@@ -1480,7 +1477,7 @@ window.leaveGroup=async function(){
   }catch(e){toast('❌ '+e.message);}
 };
 
-// NOTIFICATIONS listener (for removed from group)
+// NOTIFICATIONS
 function listenNotifications(){
   if(!CU)return;
   const q=query(collection(db,'notifications'),where('to','==',CU.uid),where('read','==',false));
@@ -1550,7 +1547,6 @@ function renderStatuses(all){
 
   const otherHtml=Object.entries(byUser).filter(([uid])=>uid!==CU.uid).map(([uid,statuses])=>{
     const s=statuses[0];
-    const safeStatuses=JSON.stringify(statuses).replace(/'/g,"\\'");
     return`<div class="st-item" onclick='viewStatus(${JSON.stringify(statuses)})'>
       <div class="st-ring">${s.pfp?`<img src="${s.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`:(s.name||'?')[0].toUpperCase()}</div>
       <span>${esc(s.name||'')}</span>
@@ -1606,27 +1602,6 @@ window.closeModal=function(id){document.getElementById(id).classList.remove('sho
 document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);}));
 
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
-
-// Patch loadMessages to cache msg data
-function loadMessages(cid){
-  if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
-  const q=query(collection(db,'chats',cid,'messages'),orderBy('timestamp','asc'));
-  msgsUnsub=onSnapshot(q,snap=>{
-    snap.docs.forEach(d=>{_msgCache[d.id]={id:d.id,...d.data()};});
-    renderMsgs(snap.docs.map(d=>({id:d.id,...d.data()})));
-    // Tag notifications
-    snap.docChanges().forEach(change=>{
-      if(change.type==='added'){
-        const m={id:change.doc.id,...change.doc.data()};
-        if(m.senderId!==CU.uid&&m.tags?.includes(CU.uid)){
-          toast(`@${m.senderUsername||m.senderName} tagged you! 👆`,3500,()=>{
-            document.getElementById('msg_'+m.id)?.scrollIntoView({behavior:'smooth',block:'center'});
-          });
-        }
-      }
-    });
-  });
-}
 
 // Online status
 async function setOnline(){if(!CU)return;try{await setDoc(doc(db,'users',CU.uid),{lastSeen:serverTimestamp()},{merge:true});}catch(e){}}
