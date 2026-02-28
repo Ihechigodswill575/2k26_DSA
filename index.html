@@ -73,9 +73,9 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
 .status-row{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:10px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
 .status-row::-webkit-scrollbar{display:none}
 .st-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0}
-.st-ring{width:46px;height:46px;border-radius:50%;border:2.5px solid var(--accent);padding:2px;position:relative;flex-shrink:0}
+.st-ring{width:46px;height:46px;border-radius:50%;border:2.5px solid var(--accent);padding:2px;position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .st-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--bg3)}
-.st-ring.add-btn{border-color:var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--accent);padding:0}
+.st-ring.add-btn{border-color:var(--border);background:var(--bg3);font-size:20px;color:var(--accent)}
 .st-mine{border-color:var(--accent2)}
 .st-item span{font-size:10px;color:var(--text2);max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 
@@ -228,6 +228,9 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
 .sv-img{max-width:100%;max-height:100%;object-fit:contain}
 .sv-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;margin-left:auto;flex-shrink:0}
 .sv-delete{background:rgba(239,68,68,0.2);border:1px solid var(--danger);color:var(--danger);font-size:12px;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit}
+.sv-footer{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);display:flex;align-items:center;justify-content:space-between}
+.sv-viewers{font-size:12px;color:rgba(255,255,255,0.8);display:flex;align-items:center;gap:5px}
+.sv-caption{font-size:13px;color:#fff;text-align:center;flex:1;padding:0 10px}
 
 .empty-list{text-align:center;padding:36px 20px;color:var(--text2);font-size:13px;line-height:1.6}
 .empty-list .ei{font-size:36px;margin-bottom:8px}
@@ -521,6 +524,10 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
     </div>
   </div>
   <img id="sv-img" class="sv-img" src="" alt="Status"/>
+  <div class="sv-footer">
+    <div class="sv-viewers" id="sv-viewers"></div>
+    <div class="sv-caption" id="sv-caption"></div>
+  </div>
 </div>
 
 <!-- IMAGE VIEWER -->
@@ -549,7 +556,6 @@ const app=initializeApp(FB);
 const auth=getAuth(app);
 const db=getFirestore(app);
 
-// STATE
 let CU=null, CUD=null;
 let activeChatId=null, activeChatType=null, activeChatData=null;
 let msgsUnsub=null, chatsUnsub=null, reqUnsub=null;
@@ -563,7 +569,6 @@ let svStatuses=[], svIdx=0, svProg=null, svStatusIds=[];
 let gcMembers=[];
 const EMOJIS=['❤️','😂','😮','😢','👍','🔥','🎉','😍','💯','🙏'];
 
-// UTILS
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(msg,dur=2800,onClick){
   const t=document.getElementById('toast');
@@ -585,7 +590,6 @@ function fmtTime(ts){
 function chatId(a,b){return[a,b].sort().join('_');}
 function secsLeft(ts){if(!ts)return 0; return Math.max(0,120-Math.floor((Date.now()-(ts.toDate?ts.toDate():new Date(ts)).getTime())/1000));}
 
-// CLOUDINARY
 async function uploadCloud(file,folder='2k26dsa'){
   const fd=new FormData();
   fd.append('file',file); fd.append('upload_preset',CLOUD_PRESET); fd.append('folder',folder);
@@ -602,9 +606,6 @@ setTimeout(()=>{
   setTimeout(()=>{document.getElementById('splash').style.display='none';checkAuth();},650);
 },3600);
 
-// ── FIX: checkAuth now has an error callback so Firebase auth failures
-//    don't leave the app stuck on the splash screen forever.
-//    loadCUD errors are caught here so showMain() always runs when logged in.
 function checkAuth(){
   onAuthStateChanged(auth, async u=>{
     if(u){
@@ -620,20 +621,16 @@ function checkAuth(){
       showAuth();
     }
   }, err=>{
-    // Firebase Auth itself errored (bad config, network, etc.)
     console.error('Auth state error:',err);
     showAuth();
   });
 }
 
-// ── FIX: loadCUD no longer swallows its own errors with a try/catch.
-//    Errors now bubble up to checkAuth which handles them safely.
 async function loadCUD(uid){
   const s=await getDoc(doc(db,'users',uid));
   CUD=s.exists()?s.data():{name:CU.displayName||'User',pfp:'',username:'',statusText:''};
   updateHeaderPfp();
 }
-
 function updateHeaderPfp(){
   const img=document.getElementById('header-pfp'), ph=document.getElementById('header-pfp-ph');
   if(CUD?.pfp){img.src=CUD.pfp;img.style.display='block';ph.style.display='none';}
@@ -647,7 +644,6 @@ function showMain(){
   loadChats(); loadStatuses(); listenRequests();
 }
 
-// AUTH TABS
 window.switchTab=function(t){
   document.getElementById('login-form').style.display=t==='login'?'block':'none';
   document.getElementById('signup-form').style.display=t==='signup'?'block':'none';
@@ -655,7 +651,6 @@ window.switchTab=function(t){
   hideErr('login-err'); hideErr('su-err');
 };
 
-// PFP PREVIEWS
 window.previewPfp=function(i){pendingPfpFile=i.files[0];if(pendingPfpFile)document.getElementById('pfp-preview').innerHTML=`<img src="${URL.createObjectURL(pendingPfpFile)}"/>`};
 window.previewGcIcon=function(i){pendingGcIconFile=i.files[0];if(pendingGcIconFile)document.getElementById('gc-icon-preview').innerHTML=`<img src="${URL.createObjectURL(pendingGcIconFile)}"/>`};
 window.previewEditPfp=function(i){pendingEditPfpFile=i.files[0];if(pendingEditPfpFile)document.getElementById('edit-pfp-preview').innerHTML=`<img src="${URL.createObjectURL(pendingEditPfpFile)}"/>`};
@@ -668,7 +663,6 @@ window.previewStatus=function(i){
     :`<img src="${url}" style="max-width:100%;border-radius:8px;max-height:160px"/>`;
 };
 
-// LOGIN
 window.doLogin=async function(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
@@ -683,7 +677,6 @@ window.doLogin=async function(){
   }
 };
 
-// SIGNUP
 window.doSignup=async function(){
   const username=document.getElementById('su-username').value.trim();
   const name=document.getElementById('su-name').value.trim();
@@ -731,7 +724,6 @@ window.doLogout=async function(){
   showAuth();
 };
 
-// PROFILE MENU
 window.toggleProfileMenu=function(){document.getElementById('pmenu').classList.toggle('show');};
 document.addEventListener('click',e=>{
   if(!e.target.closest('#pmenu')&&!e.target.closest('#profile-btn'))document.getElementById('pmenu').classList.remove('show');
@@ -764,7 +756,6 @@ window.saveProfile=async function(){
   finally{btn.disabled=false; btn.textContent='Save';}
 };
 
-// FIND USER + FRIEND REQUEST
 window.openFindUser=function(){
   document.getElementById('pmenu').classList.remove('show');
   document.getElementById('find-input').value='';
@@ -830,7 +821,6 @@ window.openDMWithUid=async function(uid,name,pfp,username){
   openChat(cid,'private',null);
 };
 
-// LISTEN REQUESTS
 function listenRequests(){
   if(reqUnsub)reqUnsub();
   const q=query(collection(db,'requests'),where('to','==',CU.uid),where('status','==','pending'));
@@ -884,7 +874,6 @@ window.declineReq=async function(reqId){
   catch(e){toast('❌ '+e.message);}
 };
 
-// LOAD CHATS
 function loadChats(){
   if(chatsUnsub)chatsUnsub();
   const q=query(collection(db,'chats'),where('members','array-contains',CU.uid));
@@ -935,7 +924,6 @@ window.switchSideTab=function(tab,el){
   document.getElementById('pane-'+tab).classList.add('active');
 };
 
-// OPEN CHAT
 window.openChat=async function(cid,type){
   activeChatId=cid; activeChatType=type;
   document.getElementById('sidebar').classList.add('hidden');
@@ -978,7 +966,6 @@ window.closeChat=function(){
   activeChatId=null; cancelEdit();
 };
 
-// MESSAGES
 const _msgCache={};
 
 function loadMessages(cid){
@@ -1051,13 +1038,11 @@ function formatText(txt){
   return txt;
 }
 
-// SEND
 window.sendMessage=async function(){
   if(!activeChatId)return;
   const ta=document.getElementById('msg-txt');
   const txt=ta.value.trim();
   if(!txt)return;
-
   if(editingMsgId){
     try{
       const mRef=doc(db,'chats',activeChatId,'messages',editingMsgId);
@@ -1069,7 +1054,6 @@ window.sendMessage=async function(){
     }catch(e){toast('❌ '+e.message);}
     cancelEdit(); ta.value=''; autoResize(ta); return;
   }
-
   const tagMatches=[...txt.matchAll(/@(\w+)/g)].map(m=>m[1]);
   let tags=[];
   if(tagMatches.length&&activeChatType==='group'){
@@ -1081,7 +1065,6 @@ window.sendMessage=async function(){
       }catch(e){}
     }
   }
-
   ta.value=''; autoResize(ta);
   try{
     await addDoc(collection(db,'chats',activeChatId,'messages'),{
@@ -1108,7 +1091,6 @@ async function updateChatMeta(lastMsg){
   }catch(e){}
 }
 
-// MEDIA
 window.sendMedia=async function(input){
   if(!activeChatId||!input.files[0])return;
   const file=input.files[0];
@@ -1126,7 +1108,6 @@ window.sendMedia=async function(input){
   input.value='';
 };
 
-// VOICE NOTES
 window.toggleVN=async function(){
   if(mediaRecorder&&mediaRecorder.state==='recording'){stopAndSendVN();return;}
   try{
@@ -1172,7 +1153,6 @@ function startRecTimer(){
 }
 function stopRecTimer(){clearInterval(recTimer);recTimer=null;recSeconds=0;}
 
-// CONTEXT MENU
 window.showCtx=function(e,msgId){
   e.preventDefault();
   ctxMsgId=msgId;
@@ -1233,7 +1213,6 @@ window.adminDeleteMsg=async function(){
   catch(e){toast('❌ '+e.message);}
 };
 
-// REACTIONS
 window.reactMsg=async function(msgId,emoji){
   if(!activeChatId)return;
   try{
@@ -1246,18 +1225,14 @@ window.reactMsg=async function(msgId,emoji){
   }catch(e){toast('❌ Reaction failed');}
 };
 
-// TAGGING
 window.handleInput=function(el){
   autoResize(el);
   const val=el.value;
   const cursor=el.selectionStart;
   const before=val.slice(0,cursor);
   const match=before.match(/@(\w*)$/);
-  if(match&&activeChatType==='group'){
-    showTagSuggest(match[1]);
-  }else{
-    hideTagSuggest();
-  }
+  if(match&&activeChatType==='group'){showTagSuggest(match[1]);}
+  else{hideTagSuggest();}
 };
 
 async function showTagSuggest(partial){
@@ -1284,9 +1259,7 @@ async function showTagSuggest(partial){
     </div>`).join('');
   sug.classList.add('show');
 }
-
 function hideTagSuggest(){document.getElementById('tag-suggest').classList.remove('show');}
-
 window.insertTag=function(username){
   const ta=document.getElementById('msg-txt');
   const val=ta.value;
@@ -1299,7 +1272,6 @@ window.insertTag=function(username){
   hideTagSuggest();
 };
 
-// GROUP CHAT CREATION
 window.openGcModal=function(){
   gcMembersToAdd=[];gcRulesArr=[];
   document.getElementById('gc-name').value='';
@@ -1310,7 +1282,6 @@ window.openGcModal=function(){
   pendingGcIconFile=null; hideErr('gc-err');
   document.getElementById('gc-overlay').classList.add('show');
 };
-
 window.addGcMember=async function(){
   const uname=document.getElementById('gc-member-input').value.trim().replace('@','');
   if(!uname)return;
@@ -1333,7 +1304,6 @@ function renderGcMembers(){
     </div>`).join('');
 }
 window.removeGcMember=function(i){gcMembersToAdd.splice(i,1);renderGcMembers();};
-
 window.addRuleInput=function(){
   const rule=document.getElementById('gc-rule-input').value.trim();
   if(!rule)return;
@@ -1342,7 +1312,6 @@ window.addRuleInput=function(){
   document.getElementById('rules-preview').innerHTML=gcRulesArr.map((r,i)=>`<li class="rule-item">📌 ${esc(r)}<button onclick="removeRule(${i})">✕</button></li>`).join('');
 };
 window.removeRule=function(i){gcRulesArr.splice(i,1);document.getElementById('rules-preview').innerHTML=gcRulesArr.map((r,j)=>`<li class="rule-item">📌 ${esc(r)}<button onclick="removeRule(${j})">✕</button></li>`).join('');};
-
 window.createGroup=async function(){
   const name=document.getElementById('gc-name').value.trim();
   const desc=document.getElementById('gc-desc').value.trim();
@@ -1368,7 +1337,6 @@ window.createGroup=async function(){
   finally{btn.disabled=false; btn.textContent='Create Group';}
 };
 
-// CHAT INFO
 window.openChatInfo=async function(){
   if(!activeChatId)return;
   const title=document.getElementById('chatinfo-title');
@@ -1477,24 +1445,20 @@ window.leaveGroup=async function(){
   }catch(e){toast('❌ '+e.message);}
 };
 
-// NOTIFICATIONS
 function listenNotifications(){
   if(!CU)return;
   const q=query(collection(db,'notifications'),where('to','==',CU.uid),where('read','==',false));
   onSnapshot(q,snap=>{
     snap.docs.forEach(async d=>{
       const n=d.data();
-      if(n.type==='removed_from_group'){
-        toast('You were removed from "'+n.groupName+'"',4000);
-      }else if(n.type==='added_to_group'){
-        toast('You were added to "'+n.groupName+'" 🎉',4000);
-      }
+      if(n.type==='removed_from_group'){toast('You were removed from "'+n.groupName+'"',4000);}
+      else if(n.type==='added_to_group'){toast('You were added to "'+n.groupName+'" 🎉',4000);}
       await updateDoc(d.ref,{read:true});
     });
   });
 }
 
-// STATUS
+// STATUS - FIXED: you can now see your own status + viewer counts
 window.openStatusModal=function(){
   pendingStatusFile=null;
   document.getElementById('status-preview').innerHTML='';
@@ -1514,7 +1478,9 @@ window.postStatus=async function(){
     await addDoc(collection(db,'statuses'),{
       uid:CU.uid, name:CUD?.name||CU.displayName, pfp:CUD?.pfp||'',
       url, caption, mediaType:pendingStatusFile.type.startsWith('video')?'video':'image',
-      timestamp:serverTimestamp(), expiresAt:Timestamp.fromMillis(Date.now()+24*3600*1000)
+      timestamp:serverTimestamp(),
+      expiresAt:Timestamp.fromMillis(Date.now()+24*3600*1000),
+      viewers:[]
     });
     closeModal('status-overlay'); pendingStatusFile=null;
     toast('Status posted! ✅'); loadStatuses();
@@ -1524,12 +1490,25 @@ window.postStatus=async function(){
 
 async function loadStatuses(){
   try{
+    // Fetch ALL statuses not yet expired - including your own
     const now=Timestamp.now();
-    const q=query(collection(db,'statuses'),where('expiresAt','>',now));
-    const snap=await getDocs(q);
+    const snap=await getDocs(query(collection(db,'statuses'),where('expiresAt','>',now)));
     const all=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderStatuses(all);
-  }catch(e){console.error('loadStatuses',e);}
+  }catch(e){
+    console.error('loadStatuses',e);
+    // If index error, fall back to fetching without the filter so at least your own status shows
+    try{
+      const snap=await getDocs(collection(db,'statuses'));
+      const now=Date.now();
+      const all=snap.docs.map(d=>({id:d.id,...d.data()})).filter(s=>{
+        if(!s.expiresAt)return true;
+        const exp=s.expiresAt.toDate?s.expiresAt.toDate():new Date(s.expiresAt);
+        return exp.getTime()>now;
+      });
+      renderStatuses(all);
+    }catch(e2){console.error('loadStatuses fallback',e2);}
+  }
 }
 
 function renderStatuses(all){
@@ -1538,20 +1517,27 @@ function renderStatuses(all){
   const byUser={};
   all.forEach(s=>{if(!byUser[s.uid])byUser[s.uid]=[];byUser[s.uid].push(s);});
 
-  const myHtml=`<div class="st-item">
-    <div class="st-ring${mine.length?' st-mine add-btn':' add-btn'}" onclick="${mine.length?`viewStatus(${JSON.stringify(mine)})`:'openStatusModal()'}">
-      ${mine.length?(mine[0].pfp?`<img src="${mine[0].pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`:CUD?.name?.[0]?.toUpperCase()||'👤'):'＋'}
+  // Always show your own status bubble - either to view your posted status or to add one
+  const myAvatar=CUD?.pfp
+    ?`<img src="${CUD.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`
+    :(CUD?.name?.[0]?.toUpperCase()||'👤');
+
+  const myHtml=`<div class="st-item" onclick="${mine.length?`viewStatus(${JSON.stringify(mine).replace(/"/g,'&quot;')})` :'openStatusModal()'}">
+    <div class="st-ring${mine.length?' st-mine':' add-btn'}">
+      ${mine.length ? myAvatar : '＋'}
     </div>
     <span>${mine.length?'My Status':'Add Status'}</span>
   </div>`;
 
-  const otherHtml=Object.entries(byUser).filter(([uid])=>uid!==CU.uid).map(([uid,statuses])=>{
-    const s=statuses[0];
-    return`<div class="st-item" onclick='viewStatus(${JSON.stringify(statuses)})'>
-      <div class="st-ring">${s.pfp?`<img src="${s.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`:(s.name||'?')[0].toUpperCase()}</div>
-      <span>${esc(s.name||'')}</span>
-    </div>`;
-  }).join('');
+  const otherHtml=Object.entries(byUser)
+    .filter(([uid])=>uid!==CU.uid)
+    .map(([uid,statuses])=>{
+      const s=statuses[0];
+      return`<div class="st-item" onclick='viewStatus(${JSON.stringify(statuses).replace(/'/g,"&#39;")})'>
+        <div class="st-ring">${s.pfp?`<img src="${s.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`:(s.name||'?')[0].toUpperCase()}</div>
+        <span>${esc(s.name||'')}</span>
+      </div>`;
+    }).join('');
 
   row.innerHTML=myHtml+otherHtml;
 }
@@ -1562,15 +1548,31 @@ window.viewStatus=function(statuses){
   document.getElementById('sv').classList.add('show');
 };
 
-function showSVAt(i){
+async function showSVAt(i){
   const s=svStatuses[i];
   if(!s){closeSV();return;}
   document.getElementById('sv-img').src=s.url;
   document.getElementById('sv-name').textContent=s.name||'';
   document.getElementById('sv-av').src=s.pfp||'';
   document.getElementById('sv-time').textContent=fmtTime(s.timestamp);
+  document.getElementById('sv-caption').textContent=s.caption||'';
+
   const isMine=s.uid===CU.uid;
   document.getElementById('sv-delete-btn').style.display=isMine?'block':'none';
+
+  // Show viewer count only to status owner
+  const viewersEl=document.getElementById('sv-viewers');
+  if(isMine){
+    const count=s.viewers?.length||0;
+    viewersEl.innerHTML=`👁 ${count} viewer${count!==1?'s':''}`;
+  }else{
+    viewersEl.innerHTML='';
+    // Record this view
+    try{
+      await updateDoc(doc(db,'statuses',s.id),{viewers:arrayUnion(CU.uid)});
+    }catch(e){}
+  }
+
   const bars=document.getElementById('sv-bars');
   bars.innerHTML=svStatuses.map((_,j)=>`<div class="sv-bar"><div class="sv-fill" id="svfill_${j}" style="width:${j<i?100:0}%"></div></div>`).join('');
   clearTimeout(svProg);
@@ -1592,23 +1594,19 @@ window.deleteStatus=async function(){
   }catch(e){toast('❌ '+e.message);}
 };
 
-// IMAGE VIEWER
 window.openImgViewer=function(url){document.getElementById('viewer-img').src=url;document.getElementById('img-viewer').classList.add('show');};
 window.closeImgViewer=function(){document.getElementById('img-viewer').classList.remove('show');};
 document.getElementById('img-viewer').addEventListener('click',function(e){if(e.target===this)closeImgViewer();});
 
-// MODAL
 window.closeModal=function(id){document.getElementById(id).classList.remove('show');};
 document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);}));
 
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
 
-// Online status
 async function setOnline(){if(!CU)return;try{await setDoc(doc(db,'users',CU.uid),{lastSeen:serverTimestamp()},{merge:true});}catch(e){}}
 setInterval(setOnline,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setOnline();});
 
-// Start notification listener after auth
 setTimeout(()=>{if(CU)listenNotifications();},4000);
 onAuthStateChanged(auth,u=>{if(u){setTimeout(listenNotifications,2000);}});
 </script>
