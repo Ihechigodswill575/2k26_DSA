@@ -523,7 +523,7 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
       </div>
     </div>
   </div>
-  <img id="sv-img" class="sv-img" src="" alt="Status"/>
+  <img id="sv-img" class="sv-img" src="" alt=""/>
   <div class="sv-footer">
     <div class="sv-viewers" id="sv-viewers"></div>
     <div class="sv-caption" id="sv-caption"></div>
@@ -570,6 +570,7 @@ let gcMembers=[];
 const EMOJIS=['❤️','😂','😮','😢','👍','🔥','🎉','😍','💯','🙏'];
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 function toast(msg,dur=2800,onClick){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
@@ -578,15 +579,21 @@ function toast(msg,dur=2800,onClick){
 }
 function showErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.style.display='block';}}
 function hideErr(id){const e=document.getElementById(id);if(e)e.style.display='none';}
+
+// FIXED: fmtTime now handles null/invalid timestamps gracefully
 function fmtTime(ts){
   if(!ts)return'';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  const now=new Date(), diff=now-d;
-  if(diff<60000)return'just now';
-  if(diff<3600000)return Math.floor(diff/60000)+'m ago';
-  if(d.toDateString()===now.toDateString())return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  return d.toLocaleDateString([],{day:'2-digit',month:'short'});
+  try{
+    const d=ts.toDate?ts.toDate():new Date(ts);
+    if(isNaN(d.getTime()))return'just now';
+    const now=new Date(), diff=now-d;
+    if(diff<60000)return'just now';
+    if(diff<3600000)return Math.floor(diff/60000)+'m ago';
+    if(d.toDateString()===now.toDateString())return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return d.toLocaleDateString([],{day:'2-digit',month:'short'});
+  }catch(e){return'just now';}
 }
+
 function chatId(a,b){return[a,b].sort().join('_');}
 function secsLeft(ts){if(!ts)return 0; return Math.max(0,120-Math.floor((Date.now()-(ts.toDate?ts.toDate():new Date(ts)).getTime())/1000));}
 
@@ -607,7 +614,7 @@ setTimeout(()=>{
 },3600);
 
 function checkAuth(){
-  onAuthStateChanged(auth, async u=>{
+  onAuthStateChanged(auth,async u=>{
     if(u){
       CU=u;
       try{await loadCUD(u.uid);}
@@ -620,7 +627,7 @@ function checkAuth(){
     }else{
       showAuth();
     }
-  }, err=>{
+  },err=>{
     console.error('Auth state error:',err);
     showAuth();
   });
@@ -1458,7 +1465,7 @@ function listenNotifications(){
   });
 }
 
-// STATUS - FIXED: you can now see your own status + viewer counts
+// STATUS
 window.openStatusModal=function(){
   pendingStatusFile=null;
   document.getElementById('status-preview').innerHTML='';
@@ -1473,31 +1480,39 @@ window.postStatus=async function(){
   const btn=document.querySelector('#status-overlay .btn:not(.btn-ghost)');
   btn.disabled=true; btn.textContent='Posting...';
   try{
+    // Upload first, THEN write to Firestore so url is never empty
+    toast('Uploading... 📤');
     const url=await uploadCloud(pendingStatusFile,'statuses');
+    if(!url)throw new Error('Upload returned empty URL');
     const caption=document.getElementById('status-caption').value.trim();
     await addDoc(collection(db,'statuses'),{
-      uid:CU.uid, name:CUD?.name||CU.displayName, pfp:CUD?.pfp||'',
-      url, caption, mediaType:pendingStatusFile.type.startsWith('video')?'video':'image',
+      uid:CU.uid,
+      name:CUD?.name||CU.displayName||'User',
+      pfp:CUD?.pfp||'',
+      url,
+      caption,
+      mediaType:pendingStatusFile.type.startsWith('video')?'video':'image',
       timestamp:serverTimestamp(),
       expiresAt:Timestamp.fromMillis(Date.now()+24*3600*1000),
       viewers:[]
     });
-    closeModal('status-overlay'); pendingStatusFile=null;
-    toast('Status posted! ✅'); loadStatuses();
+    closeModal('status-overlay');
+    pendingStatusFile=null;
+    toast('Status posted! ✅');
+    loadStatuses();
   }catch(e){showErr('status-err',e.message);}
   finally{btn.disabled=false; btn.textContent='Post Status';}
 };
 
 async function loadStatuses(){
   try{
-    // Fetch ALL statuses not yet expired - including your own
     const now=Timestamp.now();
     const snap=await getDocs(query(collection(db,'statuses'),where('expiresAt','>',now)));
     const all=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderStatuses(all);
   }catch(e){
-    console.error('loadStatuses',e);
-    // If index error, fall back to fetching without the filter so at least your own status shows
+    console.error('loadStatuses error:',e);
+    // Fallback: load all and filter client-side (avoids Firestore index errors)
     try{
       const snap=await getDocs(collection(db,'statuses'));
       const now=Date.now();
@@ -1507,7 +1522,7 @@ async function loadStatuses(){
         return exp.getTime()>now;
       });
       renderStatuses(all);
-    }catch(e2){console.error('loadStatuses fallback',e2);}
+    }catch(e2){console.error('loadStatuses fallback error:',e2);}
   }
 }
 
@@ -1517,14 +1532,13 @@ function renderStatuses(all){
   const byUser={};
   all.forEach(s=>{if(!byUser[s.uid])byUser[s.uid]=[];byUser[s.uid].push(s);});
 
-  // Always show your own status bubble - either to view your posted status or to add one
   const myAvatar=CUD?.pfp
     ?`<img src="${CUD.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`
     :(CUD?.name?.[0]?.toUpperCase()||'👤');
 
-  const myHtml=`<div class="st-item" onclick="${mine.length?`viewStatus(${JSON.stringify(mine).replace(/"/g,'&quot;')})` :'openStatusModal()'}">
+  const myHtml=`<div class="st-item" onclick="${mine.length?`viewStatus(${JSON.stringify(mine).replace(/"/g,'&quot;')})`:'openStatusModal()'}">
     <div class="st-ring${mine.length?' st-mine':' add-btn'}">
-      ${mine.length ? myAvatar : '＋'}
+      ${mine.length?myAvatar:'＋'}
     </div>
     <span>${mine.length?'My Status':'Add Status'}</span>
   </div>`;
@@ -1548,29 +1562,37 @@ window.viewStatus=function(statuses){
   document.getElementById('sv').classList.add('show');
 };
 
+// FIXED: handles null timestamp, broken image url, and records views
 async function showSVAt(i){
   const s=svStatuses[i];
   if(!s){closeSV();return;}
-  document.getElementById('sv-img').src=s.url;
+
+  // FIXED: safe image loading - don't set src to empty string
+  const svImg=document.getElementById('sv-img');
+  if(s.url){
+    svImg.src=s.url;
+    svImg.style.display='block';
+  }else{
+    svImg.style.display='none';
+  }
+
   document.getElementById('sv-name').textContent=s.name||'';
   document.getElementById('sv-av').src=s.pfp||'';
+  // FIXED: fmtTime now handles null/invalid timestamps so this won't show "Invalid Date"
   document.getElementById('sv-time').textContent=fmtTime(s.timestamp);
   document.getElementById('sv-caption').textContent=s.caption||'';
 
   const isMine=s.uid===CU.uid;
   document.getElementById('sv-delete-btn').style.display=isMine?'block':'none';
 
-  // Show viewer count only to status owner
+  // Show viewer count to owner, record view for others
   const viewersEl=document.getElementById('sv-viewers');
   if(isMine){
     const count=s.viewers?.length||0;
     viewersEl.innerHTML=`👁 ${count} viewer${count!==1?'s':''}`;
   }else{
     viewersEl.innerHTML='';
-    // Record this view
-    try{
-      await updateDoc(doc(db,'statuses',s.id),{viewers:arrayUnion(CU.uid)});
-    }catch(e){}
+    try{await updateDoc(doc(db,'statuses',s.id),{viewers:arrayUnion(CU.uid)});}catch(e){}
   }
 
   const bars=document.getElementById('sv-bars');
