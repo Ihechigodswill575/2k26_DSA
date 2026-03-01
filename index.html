@@ -229,9 +229,10 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
 .sv-media{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
 .sv-media img{width:100%;height:100%;object-fit:contain}
 .sv-media video{width:100%;height:100%;object-fit:contain}
-.sv-footer{position:absolute;bottom:0;left:0;right:0;padding:16px 16px 28px;background:linear-gradient(to top,rgba(0,0,0,0.8),transparent);display:flex;align-items:center;gap:12px}
-.sv-viewers{font-size:12px;color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:4px;flex-shrink:0}
-.sv-caption{font-size:13px;color:#fff;flex:1}
+.sv-footer{position:absolute;bottom:0;left:0;right:0;padding:16px 16px 28px;background:linear-gradient(to top,rgba(0,0,0,0.8),transparent);display:flex;flex-direction:column;gap:6px}
+.sv-viewers{font-size:12px;color:rgba(255,255,255,0.85);display:flex;align-items:center;gap:4px}
+.sv-viewer-names{font-size:11px;color:rgba(255,255,255,0.6)}
+.sv-caption{font-size:13px;color:#fff}
 
 .empty-list{text-align:center;padding:36px 20px;color:var(--text2);font-size:13px;line-height:1.6}
 .empty-list .ei{font-size:36px;margin-bottom:8px}
@@ -514,6 +515,7 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   <div class="sv-media" id="sv-media"></div>
   <div class="sv-footer">
     <div class="sv-viewers" id="sv-viewers"></div>
+    <div class="sv-viewer-names" id="sv-viewer-names"></div>
     <div class="sv-caption" id="sv-caption"></div>
   </div>
 </div>
@@ -534,7 +536,7 @@ import {
 import {
   getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
   onSnapshot, query, where, orderBy, updateDoc, deleteDoc,
-  arrayUnion, arrayRemove, serverTimestamp, Timestamp
+  arrayUnion, arrayRemove, serverTimestamp, Timestamp, deleteField
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const FB={
@@ -599,7 +601,6 @@ async function uploadCloud(file,folder='2k26dsa'){
   return d.secure_url;
 }
 
-// SPLASH
 setTimeout(()=>{
   document.getElementById('splash').classList.add('hide');
   setTimeout(()=>{document.getElementById('splash').style.display='none';checkAuth();},650);
@@ -614,9 +615,7 @@ function checkAuth(){
         updateHeaderPfp();
       }
       showMain();
-    }else{
-      showAuth();
-    }
+    }else{showAuth();}
   },()=>showAuth());
 }
 async function loadCUD(uid){
@@ -654,7 +653,6 @@ window.previewStatus=function(i){
     :`<img src="${url}" style="max-width:100%;border-radius:8px;max-height:160px"/>`;
 };
 
-// LOGIN
 window.doLogin=async function(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
@@ -665,20 +663,13 @@ window.doLogin=async function(){
   try{
     await signInWithEmailAndPassword(auth,email,pass);
   }catch(e){
-    const m={
-      'auth/user-not-found':'No account with this email.',
-      'auth/wrong-password':'Wrong password.',
-      'auth/invalid-credential':'Wrong email or password.',
-      'auth/network-request-failed':'No internet connection.',
-      'auth/invalid-email':'Invalid email address.',
-      'auth/too-many-requests':'Too many attempts. Try again later.'
-    };
+    const m={'auth/user-not-found':'No account with this email.','auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/network-request-failed':'No internet connection.','auth/invalid-email':'Invalid email address.','auth/too-many-requests':'Too many attempts. Try again later.'};
     showErr('login-err',m[e.code]||e.message);
+  }finally{
     btn.disabled=false;btn.textContent='Login';
   }
 };
 
-// SIGNUP — FIXED: create auth account FIRST then check username while authenticated
 window.doSignup=async function(){
   const username=document.getElementById('su-username').value.trim();
   const name=document.getElementById('su-name').value.trim();
@@ -689,58 +680,29 @@ window.doSignup=async function(){
   if(!name||!email||!pass){showErr('su-err','Fill all fields.');return;}
   if(pass.length<6){showErr('su-err','Password min 6 characters.');return;}
   const btn=document.getElementById('su-btn');
-  btn.disabled=true;btn.textContent='Creating account...';
+  btn.disabled=true;btn.textContent='Checking username...';
   let cred=null;
   try{
-    // Step 1: Create Firebase Auth account first (so we are authenticated for Firestore)
-    cred=await createUserWithEmailAndPassword(auth,email,pass);
-    await updateProfile(cred.user,{displayName:name});
-
-    // Step 2: Now check username uniqueness (we are authenticated now)
-    btn.textContent='Checking username...';
     const usnap=await getDocs(query(collection(db,'users'),where('username','==',username)));
     if(!usnap.empty){
-      // Username taken — delete the auth account we just made and show error
-      await deleteUser(cred.user);
       showErr('su-err','Username already taken. Try another.');
       btn.disabled=false;btn.textContent='Create Account';
       return;
     }
-
-    // Step 3: Upload profile pic if chosen
+    btn.textContent='Creating account...';
+    cred=await createUserWithEmailAndPassword(auth,email,pass);
+    await updateProfile(cred.user,{displayName:name});
     let pfpUrl='';
     if(pendingPfpFile){
       btn.textContent='Uploading photo...';
-      try{
-        pfpUrl=await uploadCloud(pendingPfpFile,'pfps');
-        await updateProfile(cred.user,{photoURL:pfpUrl});
-      }catch(ue){console.warn('PFP skip',ue);}
+      try{pfpUrl=await uploadCloud(pendingPfpFile,'pfps');await updateProfile(cred.user,{photoURL:pfpUrl});}catch(ue){console.warn('PFP skip',ue);}
     }
-
-    // Step 4: Save user document
     btn.textContent='Saving profile...';
-    await setDoc(doc(db,'users',cred.user.uid),{
-      uid:cred.user.uid,
-      name,
-      email:email.toLowerCase(),
-      username,
-      pfp:pfpUrl,
-      statusText:'Hey there! I am on 2k26_DSA',
-      createdAt:serverTimestamp(),
-      friends:[]
-    });
+    await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,name,email:email.toLowerCase(),username,pfp:pfpUrl,statusText:'Hey there! I am on 2k26_DSA',createdAt:serverTimestamp(),friends:[]});
     toast('Welcome to 2k26_DSA! 🎉');
   }catch(e){
-    // If auth account was created but something else failed, clean up
-    if(cred?.user){
-      try{await deleteUser(cred.user);}catch(de){}
-    }
-    const m={
-      'auth/email-already-in-use':'Email already registered.',
-      'auth/weak-password':'Password too weak.',
-      'auth/invalid-email':'Invalid email.',
-      'auth/network-request-failed':'No internet.'
-    };
+    if(cred?.user){try{await deleteUser(cred.user);}catch(de){}}
+    const m={'auth/email-already-in-use':'Email already registered.','auth/weak-password':'Password too weak.','auth/invalid-email':'Invalid email.','auth/network-request-failed':'No internet.'};
     showErr('su-err',m[e.code]||e.message);
     btn.disabled=false;btn.textContent='Create Account';
   }
@@ -805,8 +767,8 @@ window.findUser=async function(){
     if(snap.empty){document.getElementById('find-result').innerHTML='<p style="color:var(--text2);font-size:13px;margin-top:8px">No user found.</p>';return;}
     const u=snap.docs[0].data();
     const isFriend=(CUD?.friends||[]).includes(u.uid);
-    const reqSnap=await getDoc(doc(db,'requests',CU.uid+'_'+u.uid));
-    const alreadySent=reqSnap.exists();
+    let alreadySent=false;
+    try{const reqSnap=await getDoc(doc(db,'requests',CU.uid+'_'+u.uid));alreadySent=reqSnap.exists();}catch(re){}
     document.getElementById('find-result').innerHTML=`
       <div class="user-search-result">
         <div class="usr-av">${u.pfp?`<img src="${u.pfp}"/>`:(u.name||'?')[0].toUpperCase()}</div>
@@ -825,23 +787,13 @@ window.findUser=async function(){
 };
 window.sendFriendReq=async function(toUid,toName,toPfp,toUsername){
   try{
-    await setDoc(doc(db,'requests',CU.uid+'_'+toUid),{
-      from:CU.uid,fromName:CUD?.name||CU.displayName,fromPfp:CUD?.pfp||'',fromUsername:CUD?.username||'',
-      to:toUid,toName,toPfp,toUsername,status:'pending',createdAt:serverTimestamp()
-    });
+    await setDoc(doc(db,'requests',CU.uid+'_'+toUid),{from:CU.uid,fromName:CUD?.name||CU.displayName,fromPfp:CUD?.pfp||'',fromUsername:CUD?.username||'',to:toUid,toName,toPfp,toUsername,status:'pending',createdAt:serverTimestamp()});
     toast('Friend request sent to @'+toUsername+' ✅');window.findUser();
   }catch(e){toast('❌ '+e.message);}
 };
 window.openDMWithUid=async function(uid,name,pfp,username){
   const cid=chatId(CU.uid,uid);
-  await setDoc(doc(db,'chats',cid),{
-    type:'private',members:[CU.uid,uid],
-    memberData:{
-      [CU.uid]:{name:CUD?.name||CU.displayName,pfp:CUD?.pfp||'',username:CUD?.username||''},
-      [uid]:{name,pfp,username}
-    },
-    lastMsg:'',lastTime:serverTimestamp(),unread:{}
-  },{merge:true});
+  await setDoc(doc(db,'chats',cid),{type:'private',members:[CU.uid,uid],memberData:{[CU.uid]:{name:CUD?.name||CU.displayName,pfp:CUD?.pfp||'',username:CUD?.username||''},[uid]:{name,pfp,username}},lastMsg:'',lastTime:serverTimestamp(),unread:{}},{merge:true});
   closeModal('find-overlay');openChat(cid,'private');
 };
 
@@ -875,14 +827,7 @@ window.acceptReq=async function(reqId,fromUid,fromName,fromPfp,fromUsername){
     await updateDoc(doc(db,'users',CU.uid),{friends:arrayUnion(fromUid)});
     await updateDoc(doc(db,'users',fromUid),{friends:arrayUnion(CU.uid)});
     const cid=chatId(CU.uid,fromUid);
-    await setDoc(doc(db,'chats',cid),{
-      type:'private',members:[CU.uid,fromUid],
-      memberData:{
-        [CU.uid]:{name:CUD?.name||CU.displayName,pfp:CUD?.pfp||'',username:CUD?.username||''},
-        [fromUid]:{name:fromName,pfp:fromPfp,username:fromUsername}
-      },
-      lastMsg:'',lastTime:serverTimestamp(),unread:{}
-    },{merge:true});
+    await setDoc(doc(db,'chats',cid),{type:'private',members:[CU.uid,fromUid],memberData:{[CU.uid]:{name:CUD?.name||CU.displayName,pfp:CUD?.pfp||'',username:CUD?.username||''},[fromUid]:{name:fromName,pfp:fromPfp,username:fromUsername}},lastMsg:'',lastTime:serverTimestamp(),unread:{}},{merge:true});
     CUD={...CUD,friends:[...(CUD?.friends||[]),fromUid]};
     toast('You and @'+fromUsername+' are now friends! 🎉');
   }catch(e){toast('❌ '+e.message);}
@@ -909,11 +854,7 @@ function renderChatPane(paneId,items){
   pane.innerHTML=items.map(item=>{
     let name='',pfp='',last=item.lastMsg||'';
     if(item.type==='group'){name=item.name||'Group';pfp=item.icon||'';}
-    else{
-      const other=item.members?.find(m=>m!==CU.uid);
-      const od=item.memberData?.[other]||{};
-      name=od.name||'Unknown';pfp=od.pfp||'';
-    }
+    else{const other=item.members?.find(m=>m!==CU.uid);const od=item.memberData?.[other]||{};name=od.name||'Unknown';pfp=od.pfp||'';}
     const unread=item.unread?.[CU.uid]||0;
     const av=pfp?`<div class="ci-av"><img src="${pfp}" onerror="this.style.display='none'"/></div>`:`<div class="ci-av">${(name[0]||'?').toUpperCase()}</div>`;
     return`<div class="ci${activeChatId===item.id?' active':''}" onclick="openChat('${item.id}','${item.type||'private'}')" data-id="${item.id}">
@@ -936,6 +877,17 @@ window.switchSideTab=function(tab,el){
 };
 
 window.openChat=async function(cid,type){
+  if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
+  document.getElementById('msgs').innerHTML='';
+  // FIX Bug 3: Reset all UI immediately before any awaits to prevent stale UI leaking between chats
+  document.getElementById('gc-rules-banner').classList.remove('show');
+  document.getElementById('gc-rules-text').textContent='';
+  document.getElementById('ch-name').textContent='Loading...';
+  document.getElementById('ch-sub').textContent='';
+  document.getElementById('ch-avatar').innerHTML='';
+  hideTagSuggest();
+  cancelEdit();
+
   activeChatId=cid;activeChatType=type;
   document.getElementById('sidebar').classList.add('hidden');
   document.getElementById('no-chat').style.display='none';
@@ -957,12 +909,12 @@ window.openChat=async function(cid,type){
       else gcBanner.classList.remove('show');
     }else{
       gcBanner.classList.remove('show');
+      gcMembers=[];
       const other=d.members?.find(m=>m!==CU.uid);
       const od=d.memberData?.[other]||{};
       document.getElementById('ch-name').textContent=od.name||'User';
       document.getElementById('ch-sub').textContent=od.username?'@'+od.username:'Private chat';
       chAv.innerHTML=od.pfp?`<img src="${od.pfp}"/>`:(od.name||'U')[0].toUpperCase();
-      gcMembers=[];
     }
     try{await updateDoc(doc(db,'chats',cid),{[`unread.${CU.uid}`]:0});}catch(e){}
   }catch(e){console.error('openChat',e);}
@@ -973,16 +925,22 @@ window.closeChat=function(){
   document.getElementById('active-chat').style.display='none';
   document.getElementById('no-chat').style.display='flex';
   if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
-  activeChatId=null;cancelEdit();
+  document.getElementById('msgs').innerHTML='';
+  activeChatId=null;activeChatType=null;activeChatData=null;
+  gcMembers=[];cancelEdit();hideTagSuggest();
 };
 
 const _msgCache={};
 function loadMessages(cid){
   if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
+  document.getElementById('msgs').innerHTML='';
+  // FIX Bug 4: Capture chatType at load time so switching chats can't corrupt message rendering
+  const capturedType=activeChatType;
   const q=query(collection(db,'chats',cid,'messages'),orderBy('timestamp','asc'));
   msgsUnsub=onSnapshot(q,snap=>{
+    if(activeChatId!==cid)return;
     snap.docs.forEach(d=>{_msgCache[d.id]={id:d.id,...d.data()};});
-    renderMsgs(snap.docs.map(d=>({id:d.id,...d.data()})));
+    renderMsgs(snap.docs.map(d=>({id:d.id,...d.data()})),capturedType);
     snap.docChanges().forEach(ch=>{
       if(ch.type==='added'){
         const m={id:ch.doc.id,...ch.doc.data()};
@@ -995,10 +953,10 @@ function loadMessages(cid){
     });
   });
 }
-function renderMsgs(msgs){
+function renderMsgs(msgs,chatType){
   const c=document.getElementById('msgs');
   const atBot=c.scrollHeight-c.scrollTop-c.clientHeight<150;
-  c.innerHTML=msgs.map(m=>renderMsg(m)).join('');
+  c.innerHTML=msgs.map(m=>renderMsg(m,chatType)).join('');
   if(atBot||msgs.length<=2)c.scrollTop=c.scrollHeight;
   msgs.forEach(m=>{
     if(m.senderId===CU.uid&&!m.deleted&&!m.edited&&m.timestamp){
@@ -1019,7 +977,7 @@ function renderMsgs(msgs){
     }
   });
 }
-function renderMsg(m){
+function renderMsg(m,chatType){
   const isOut=m.senderId===CU.uid;
   if(m.deleted)return`<div class="mw ${isOut?'out':'in'}"><div class="mb deleted">🚫 Deleted</div><span class="m-time">${fmtTime(m.timestamp)}</span></div>`;
   const sl=secsLeft(m.timestamp);
@@ -1031,7 +989,8 @@ function renderMsg(m){
   const reactions=m.reactions||{};
   const rHtml=Object.entries(reactions).filter(([,v])=>v?.length).map(([e,u])=>
     `<div class="rpill${u.includes(CU.uid)?' mine':''}" onclick="reactMsg('${m.id}','${e}')">${e}<span class="rc">${u.length}</span></div>`).join('');
-  const sName=!isOut&&activeChatType==='group'?`<div class="m-sender">${esc(m.senderName||'')}</div>`:'';
+  // FIX Bug 4: Use captured chatType param instead of global activeChatType
+  const sName=!isOut&&chatType==='group'?`<div class="m-sender">${esc(m.senderName||'')}</div>`:'';
   const timerHtml=isOut&&!m.edited&&sl>0?`<span class="edit-timer" id="etimer_${m.id}">✏️ ${sl}s</span>`:'';
   return`<div class="mw ${isOut?'out':'in'}">${sName}${content}${rHtml?`<div class="m-reactions">${rHtml}</div>`:''}<span class="m-time">${fmtTime(m.timestamp)}</span>${timerHtml}</div>`;
 }
@@ -1055,20 +1014,12 @@ window.sendMessage=async function(){
   if(activeChatType==='group'){
     const tagMatches=[...txt.matchAll(/@(\w+)/g)].map(m=>m[1]);
     for(const uname of tagMatches){
-      try{
-        const s=await getDocs(query(collection(db,'users'),where('username','==',uname)));
-        if(!s.empty)tags.push(s.docs[0].data().uid);
-      }catch(e){}
+      try{const s=await getDocs(query(collection(db,'users'),where('username','==',uname)));if(!s.empty)tags.push(s.docs[0].data().uid);}catch(e){}
     }
   }
   ta.value='';autoResize(ta);
   try{
-    await addDoc(collection(db,'chats',activeChatId,'messages'),{
-      type:'text',text:txt,senderId:CU.uid,
-      senderName:CUD?.name||CU.displayName||'User',
-      senderUsername:CUD?.username||'',
-      timestamp:serverTimestamp(),reactions:{},tags,deleted:false,edited:false
-    });
+    await addDoc(collection(db,'chats',activeChatId,'messages'),{type:'text',text:txt,senderId:CU.uid,senderName:CUD?.name||CU.displayName||'User',senderUsername:CUD?.username||'',timestamp:serverTimestamp(),reactions:{},tags,deleted:false,edited:false});
     await updateChatMeta(txt);
   }catch(e){toast('❌ '+e.message);}
 };
@@ -1088,11 +1039,7 @@ window.sendMedia=async function(input){
   const file=input.files[0];toast('Uploading... 📤');
   try{
     const url=await uploadCloud(file,'media');
-    await addDoc(collection(db,'chats',activeChatId,'messages'),{
-      type:'image',url,senderId:CU.uid,
-      senderName:CUD?.name||CU.displayName||'User',
-      timestamp:serverTimestamp(),reactions:{},tags:[],deleted:false,edited:false
-    });
+    await addDoc(collection(db,'chats',activeChatId,'messages'),{type:'image',url,senderId:CU.uid,senderName:CUD?.name||CU.displayName||'User',timestamp:serverTimestamp(),reactions:{},tags:[],deleted:false,edited:false});
     await updateChatMeta(file.type.startsWith('video')?'🎥 Video':'📷 Photo');
     toast('Sent ✅');
   }catch(e){toast('❌ '+e.message);}
@@ -1103,29 +1050,34 @@ window.toggleVN=async function(){
   if(mediaRecorder&&mediaRecorder.state==='recording'){stopAndSendVN();return;}
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const targetChatId=activeChatId;
     mediaRecorder=new MediaRecorder(stream);recChunks=[];
     mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recChunks.push(e.data);};
     mediaRecorder.onstop=async()=>{
       stream.getTracks().forEach(t=>t.stop());
-      if(!recChunks.length)return;
+      if(!recChunks.length||!targetChatId)return;
       const blob=new Blob(recChunks,{type:'audio/webm'});
       const file=new File([blob],`vn_${Date.now()}.webm`,{type:'audio/webm'});
       toast('Sending voice note...');
       try{
         const url=await uploadCloud(file,'voicenotes');
-        await addDoc(collection(db,'chats',activeChatId,'messages'),{
-          type:'audio',url,senderId:CU.uid,
-          senderName:CUD?.name||CU.displayName||'User',
-          timestamp:serverTimestamp(),reactions:{},tags:[],deleted:false,edited:false
-        });
-        await updateChatMeta('🎤 Voice note');toast('Sent ✅');
+        await addDoc(collection(db,'chats',targetChatId,'messages'),{type:'audio',url,senderId:CU.uid,senderName:CUD?.name||CU.displayName||'User',timestamp:serverTimestamp(),reactions:{},tags:[],deleted:false,edited:false});
+        const snapMeta=await getDoc(doc(db,'chats',targetChatId));
+        const dMeta=snapMeta.data()||{};
+        const unreadMeta={...dMeta.unread||{}};
+        (dMeta.members||[]).forEach(m=>{if(m!==CU.uid)unreadMeta[m]=(unreadMeta[m]||0)+1;});
+        await updateDoc(doc(db,'chats',targetChatId),{lastMsg:'🎤 Voice note',lastTime:serverTimestamp(),unread:unreadMeta});
+        toast('Sent ✅');
       }catch(e){toast('❌ VN failed: '+e.message);}
     };
     mediaRecorder.start();startRecTimer();
     document.getElementById('normal-iw').style.display='none';
     document.getElementById('vn-bar').classList.add('show');
     document.getElementById('vn-btn').style.display='none';
-  }catch(e){toast('❌ Mic access denied');}
+  }catch(e){
+    resetVNUI();
+    toast('❌ Mic access denied');
+  }
 };
 window.stopAndSendVN=function(){if(mediaRecorder&&mediaRecorder.state==='recording')mediaRecorder.stop();stopRecTimer();resetVNUI();};
 window.cancelVN=function(){
@@ -1133,6 +1085,7 @@ window.cancelVN=function(){
   recChunks=[];stopRecTimer();resetVNUI();
 };
 function resetVNUI(){
+  mediaRecorder=null;
   document.getElementById('normal-iw').style.display='flex';
   document.getElementById('vn-bar').classList.remove('show');
   document.getElementById('vn-btn').style.display='flex';
@@ -1145,19 +1098,21 @@ function stopRecTimer(){clearInterval(recTimer);recTimer=null;recSeconds=0;}
 
 window.showCtx=function(e,msgId){
   e.preventDefault();
-  ctxMsgId=msgId;ctxMsgData=_msgCache[msgId];
+  ctxMsgId=msgId;
+  ctxMsgData=_msgCache[msgId]||null;
+  if(!ctxMsgData)return;
   const menu=document.getElementById('msg-ctx-menu');
-  const isOwn=ctxMsgData?.senderId===CU.uid;
+  const isOwn=ctxMsgData.senderId===CU.uid;
   const isAdmin=activeChatType==='group'&&activeChatData?.admins?.includes(CU.uid);
-  const canEdit=isOwn&&!ctxMsgData?.deleted&&!ctxMsgData?.edited&&secsLeft(ctxMsgData?.timestamp)>0&&ctxMsgData?.type==='text';
+  const canEdit=isOwn&&!ctxMsgData.deleted&&!ctxMsgData.edited&&secsLeft(ctxMsgData.timestamp)>0&&ctxMsgData.type==='text';
   document.getElementById('ctx-edit').style.display=canEdit?'flex':'none';
-  document.getElementById('ctx-delete').style.display=isOwn&&!ctxMsgData?.deleted?'flex':'none';
-  document.getElementById('ctx-admin-delete').style.display=isAdmin&&!isOwn&&!ctxMsgData?.deleted?'flex':'none';
+  document.getElementById('ctx-delete').style.display=isOwn&&!ctxMsgData.deleted?'flex':'none';
+  document.getElementById('ctx-admin-delete').style.display=isAdmin&&!isOwn&&!ctxMsgData.deleted?'flex':'none';
   menu.style.left=Math.min(e.clientX,window.innerWidth-170)+'px';
   menu.style.top=Math.min(e.clientY,window.innerHeight-180)+'px';
   menu.classList.add('show');
 };
-function hideCtxMenu(){document.getElementById('msg-ctx-menu').classList.remove('show');ctxMsgId=null;}
+function hideCtxMenu(){document.getElementById('msg-ctx-menu').classList.remove('show');ctxMsgId=null;ctxMsgData=null;}
 window.showEmojiFromCtx=function(){
   if(!ctxMsgId)return;
   const menu=document.getElementById('msg-ctx-menu');
@@ -1178,15 +1133,28 @@ window.startEdit=function(){
   hideCtxMenu();
 };
 window.cancelEdit=function(){editingMsgId=null;document.getElementById('edit-bar').classList.remove('show');document.getElementById('msg-txt').value='';};
+
 window.deleteMsg=async function(){
-  if(!ctxMsgId||!activeChatId)return;hideCtxMenu();
-  try{await updateDoc(doc(db,'chats',activeChatId,'messages',ctxMsgId),{deleted:true,text:'',url:''});toast('Message deleted');}
-  catch(e){toast('❌ '+e.message);}
+  if(!ctxMsgId||!activeChatId)return;
+  hideCtxMenu();
+  try{
+    const mRef=doc(db,'chats',activeChatId,'messages',ctxMsgId);
+    const snap=await getDoc(mRef);
+    if(!snap.exists())return;
+    await updateDoc(mRef,{deleted:true,text:'',url:''});
+    toast('Message deleted');
+  }catch(e){toast('❌ '+e.message);}
 };
 window.adminDeleteMsg=async function(){
-  if(!ctxMsgId||!activeChatId)return;hideCtxMenu();
-  try{await updateDoc(doc(db,'chats',activeChatId,'messages',ctxMsgId),{deleted:true,text:'',url:''});toast('Deleted');}
-  catch(e){toast('❌ '+e.message);}
+  if(!ctxMsgId||!activeChatId)return;
+  hideCtxMenu();
+  try{
+    const mRef=doc(db,'chats',activeChatId,'messages',ctxMsgId);
+    const snap=await getDoc(mRef);
+    if(!snap.exists())return;
+    await updateDoc(mRef,{deleted:true,text:'',url:''});
+    toast('Deleted');
+  }catch(e){toast('❌ '+e.message);}
 };
 window.reactMsg=async function(msgId,emoji){
   if(!activeChatId)return;
@@ -1207,18 +1175,16 @@ window.handleInput=function(el){
   else hideTagSuggest();
 };
 async function showTagSuggest(partial){
-  if(!gcMembers.length)return;
+  if(!gcMembers.length){hideTagSuggest();return;}
   const sug=document.getElementById('tag-suggest');
   const matches=[];
+  const memberData=activeChatData?.memberData||{};
   for(const uid of gcMembers){
     if(uid===CU.uid)continue;
-    try{
-      const s=await getDoc(doc(db,'users',uid));
-      if(s.exists()){
-        const u=s.data();
-        if(!partial||u.username?.startsWith(partial)||u.name?.toLowerCase().startsWith(partial.toLowerCase()))matches.push(u);
-      }
-    }catch(e){}
+    const u=memberData[uid];
+    if(!u)continue;
+    if(!partial||u.username?.startsWith(partial)||u.name?.toLowerCase().startsWith(partial.toLowerCase()))
+      matches.push({...u,uid});
     if(matches.length>=5)break;
   }
   if(!matches.length){hideTagSuggest();return;}
@@ -1281,11 +1247,7 @@ window.createGroup=async function(){
     const allMembers=[CU.uid,...gcMembersToAdd.map(m=>m.uid)];
     const memberData={[CU.uid]:{name:CUD?.name||CU.displayName,pfp:CUD?.pfp||'',username:CUD?.username||''}};
     gcMembersToAdd.forEach(m=>{memberData[m.uid]={name:m.name,pfp:m.pfp||'',username:m.username||''};});
-    const gcDoc=await addDoc(collection(db,'chats'),{
-      type:'group',name,description:document.getElementById('gc-desc').value.trim(),icon,
-      members:allMembers,memberData,admins:[CU.uid],rules:gcRulesArr,
-      lastMsg:'Group created',lastTime:serverTimestamp(),unread:{}
-    });
+    const gcDoc=await addDoc(collection(db,'chats'),{type:'group',name,description:document.getElementById('gc-desc').value.trim(),icon,members:allMembers,memberData,admins:[CU.uid],rules:gcRulesArr,lastMsg:'Group created',lastTime:serverTimestamp(),unread:{}});
     closeModal('gc-overlay');toast('"'+name+'" created! 🎉');openChat(gcDoc.id,'group');
   }catch(e){showErr('gc-err',e.message);}
   finally{btn.disabled=false;btn.textContent='Create Group';}
@@ -1350,7 +1312,7 @@ window.adminAddMember=async function(){
 };
 window.adminRemoveMember=async function(uid){
   if(!activeChatId)return;
-  try{await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(uid)});toast('Member removed');openChatInfo();}
+  try{await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(uid),[`memberData.${uid}`]:deleteField()});toast('Member removed');openChatInfo();}
   catch(e){toast('❌ '+e.message);}
 };
 window.adminAddRule=async function(){
@@ -1361,7 +1323,7 @@ window.adminAddRule=async function(){
 };
 window.leaveGroup=async function(){
   if(!activeChatId)return;
-  try{await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(CU.uid)});closeModal('chatinfo-overlay');closeChat();toast('You left the group');}
+  try{await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(CU.uid),[`memberData.${CU.uid}`]:deleteField()});closeModal('chatinfo-overlay');closeChat();toast('You left the group');}
   catch(e){toast('❌ '+e.message);}
 };
 
@@ -1398,7 +1360,7 @@ window.postStatus=async function(){
       mediaType:pendingStatusFile.type.startsWith('video')?'video':'image',
       timestamp:serverTimestamp(),
       expiresAt:Timestamp.fromMillis(Date.now()+24*3600*1000),
-      viewers:[]
+      viewers:[],viewerNames:[]
     });
     closeModal('status-overlay');pendingStatusFile=null;
     toast('Status posted! ✅');loadStatuses();
@@ -1443,13 +1405,14 @@ window.viewStatus=function(statuses){
   svStatuses=Array.isArray(statuses)?statuses:JSON.parse(statuses);
   svIdx=0;document.getElementById('sv').classList.add('show');showSVAt(0);
 };
+
 async function showSVAt(i){
   if(i>=svStatuses.length){closeSV();return;}
   svIdx=i;const s=svStatuses[i];
   const mediaEl=document.getElementById('sv-media');
   if(s.url){
     if(s.mediaType==='video'){
-      mediaEl.innerHTML=`<video src="${s.url}" autoplay playsinline loop style="width:100%;height:100%;object-fit:contain;background:#000"></video>`;
+      mediaEl.innerHTML=`<video src="${s.url}" autoplay playsinline style="width:100%;height:100%;object-fit:contain;background:#000"></video>`;
     }else{
       mediaEl.innerHTML=`<img src="${s.url}" style="width:100%;height:100%;object-fit:contain"/>`;
     }
@@ -1462,26 +1425,79 @@ async function showSVAt(i){
   const isMine=s.uid===CU.uid;
   document.getElementById('sv-delete-btn').style.display=isMine?'inline-block':'none';
   const viewersEl=document.getElementById('sv-viewers');
+  const viewerNamesEl=document.getElementById('sv-viewer-names');
   if(isMine){
-    const cnt=s.viewers?.length||0;
-    viewersEl.innerHTML=`👁 ${cnt} viewer${cnt!==1?'s':''}`;
+    try{
+      const freshSnap=await getDoc(doc(db,'statuses',s.id));
+      if(freshSnap.exists()){
+        const fresh=freshSnap.data();
+        const viewerIds=fresh.viewers||[];
+        const storedNames=fresh.viewerNames||[];
+        const cnt=viewerIds.length;
+        viewersEl.innerHTML=`👁 ${cnt} viewer${cnt!==1?'s':''}`;
+        if(storedNames.length>0){
+          viewerNamesEl.textContent='Viewed by: '+storedNames.slice(0,5).join(', ')+(cnt>5?` +${cnt-5} more`:'');
+        }else if(cnt>0){
+          const names=[];
+          for(const uid of viewerIds.slice(0,5)){
+            try{const usnap=await getDoc(doc(db,'users',uid));if(usnap.exists())names.push(usnap.data().name||'Unknown');}catch(e){}
+          }
+          viewerNamesEl.textContent='Viewed by: '+names.join(', ')+(cnt>5?` +${cnt-5} more`:'');
+        }else{
+          viewerNamesEl.textContent='No views yet';
+        }
+      }
+    }catch(e){
+      const cnt=s.viewers?.length||0;
+      viewersEl.innerHTML=`👁 ${cnt} viewer${cnt!==1?'s':''}`;
+      viewerNamesEl.textContent='';
+    }
   }else{
     viewersEl.innerHTML='';
-    try{await updateDoc(doc(db,'statuses',s.id),{viewers:arrayUnion(CU.uid)});}catch(e){}
+    viewerNamesEl.textContent='';
+    try{
+      const alreadyViewed=(s.viewers||[]).includes(CU.uid);
+      if(!alreadyViewed){
+        await updateDoc(doc(db,'statuses',s.id),{
+          viewers:arrayUnion(CU.uid),
+          viewerNames:arrayUnion(CUD?.name||CU.displayName||'Someone')
+        });
+      }
+    }catch(e){}
   }
   const bars=document.getElementById('sv-bars');
   bars.innerHTML=svStatuses.map((_,j)=>`<div class="sv-bar"><div class="sv-fill" id="svfill_${j}" style="width:${j<i?'100':'0'}%"></div></div>`).join('');
   clearTimeout(svProg);
-  requestAnimationFrame(()=>{
-    const fill=document.getElementById('svfill_'+i);
-    if(fill){fill.style.transition='width 5s linear';fill.style.width='100%';}
-  });
-  svProg=setTimeout(()=>showSVAt(i+1),5100);
+  if(s.mediaType==='video'){
+    const vid=mediaEl.querySelector('video');
+    if(vid){
+      vid.onloadedmetadata=()=>{
+        const duration=vid.duration||15;
+        const fill=document.getElementById('svfill_'+i);
+        if(fill){fill.style.transition=`width ${duration}s linear`;fill.style.width='100%';}
+        svProg=setTimeout(()=>showSVAt(i+1),duration*1000+100);
+      };
+      vid.onerror=()=>{
+        const fill=document.getElementById('svfill_'+i);
+        if(fill){fill.style.transition='width 15s linear';fill.style.width='100%';}
+        svProg=setTimeout(()=>showSVAt(i+1),15100);
+      };
+    }
+  }else{
+    requestAnimationFrame(()=>{
+      const fill=document.getElementById('svfill_'+i);
+      if(fill){fill.style.transition='width 8s linear';fill.style.width='100%';}
+    });
+    svProg=setTimeout(()=>showSVAt(i+1),8100);
+  }
 }
+
 window.closeSV=function(){
   clearTimeout(svProg);
   document.getElementById('sv').classList.remove('show');
   document.getElementById('sv-media').innerHTML='';
+  document.getElementById('sv-viewers').innerHTML='';
+  document.getElementById('sv-viewer-names').textContent='';
 };
 window.deleteStatus=async function(){
   const s=svStatuses[svIdx];
