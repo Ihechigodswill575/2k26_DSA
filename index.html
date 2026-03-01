@@ -214,20 +214,18 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
 .img-viewer img{max-width:90%;max-height:90%;border-radius:var(--radius);object-fit:contain}
 .img-viewer-close{position:absolute;top:20px;right:20px;background:var(--bg3);border:none;color:var(--text);font-size:22px;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-/* STATUS VIEWER */
 .sv{display:none;position:fixed;inset:0;background:#000;z-index:400;flex-direction:column}
 .sv.show{display:flex}
 .sv-header{padding:14px 16px;position:absolute;top:0;left:0;right:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,0.85),transparent)}
 .sv-bars{display:flex;gap:4px;margin-bottom:10px}
 .sv-bar{height:3px;flex:1;background:rgba(255,255,255,0.3);border-radius:3px;overflow:hidden}
-.sv-fill{height:100%;background:#fff;border-radius:3px;width:0;transition:none}
+.sv-fill{height:100%;background:#fff;border-radius:3px;width:0}
 .sv-meta{display:flex;align-items:center;gap:8px}
 .sv-av{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3)}
 .sv-name{font-size:13px;font-weight:600;color:#fff;flex:1}
 .sv-time{font-size:11px;color:rgba(255,255,255,0.6);flex-shrink:0}
 .sv-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;flex-shrink:0;padding:0 4px}
 .sv-delete{background:rgba(239,68,68,0.2);border:1px solid var(--danger);color:var(--danger);font-size:12px;padding:4px 10px;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;flex-shrink:0}
-/* The actual status media fills the whole screen */
 .sv-media{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
 .sv-media img{width:100%;height:100%;object-fit:contain}
 .sv-media video{width:100%;height:100%;object-fit:contain}
@@ -322,7 +320,7 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
       <div class="s-search">
         <div class="search-wrap">
           <span style="color:var(--text2);font-size:14px">🔍</span>
-          <input type="text" placeholder="Search chats..." oninput="filterChats(this.value)" id="chat-search"/>
+          <input type="text" placeholder="Search chats..." oninput="filterChats(this.value)"/>
         </div>
       </div>
       <div class="sidebar-tabs">
@@ -348,7 +346,7 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
             <div class="ch-name" id="ch-name"></div>
             <div class="ch-sub" id="ch-sub"></div>
           </div>
-          <button class="ibtn" onclick="openChatInfo()" title="Info">ℹ️</button>
+          <button class="ibtn" onclick="openChatInfo()">ℹ️</button>
         </div>
         <div class="gc-rules-banner" id="gc-rules-banner"><strong>📋 Group Rules</strong><div id="gc-rules-text"></div></div>
         <div class="msgs" id="msgs"></div>
@@ -363,7 +361,7 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
           <div class="iw" id="normal-iw">
             <textarea id="msg-txt" placeholder="Type a message..." rows="1" oninput="handleInput(this)" onkeydown="handleEnter(event)"></textarea>
             <div class="iw-actions">
-              <label style="cursor:pointer;font-size:17px;color:var(--text2)" title="Send image">
+              <label style="cursor:pointer;font-size:17px;color:var(--text2)">
                 🖼️<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this)"/>
               </label>
             </div>
@@ -382,14 +380,12 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   </div>
 </div>
 
-<!-- PROFILE MENU -->
 <div class="pmenu" id="pmenu">
   <div class="pmi" onclick="openProfileEdit()">✏️ Edit Profile</div>
   <div class="pmi" onclick="openFindUser()">🔍 Find User</div>
   <div class="pmi" onclick="doLogout()" style="color:var(--danger)">🚪 Logout</div>
 </div>
 
-<!-- MSG CONTEXT MENU -->
 <div class="msg-ctx-menu" id="msg-ctx-menu">
   <div class="ctx-item" onclick="showEmojiFromCtx()">😊 React</div>
   <div class="ctx-item" id="ctx-edit" onclick="startEdit()">✏️ Edit</div>
@@ -398,7 +394,6 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
 </div>
 <div class="emoji-picker" id="global-ep"></div>
 
-<!-- CREATE GROUP -->
 <div class="overlay" id="gc-overlay">
   <div class="modal">
     <h3>Create Group</h3>
@@ -436,7 +431,6 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   </div>
 </div>
 
-<!-- FIND USER -->
 <div class="overlay" id="find-overlay">
   <div class="modal">
     <h3>🔍 Find User</h3>
@@ -455,7 +449,6 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   </div>
 </div>
 
-<!-- STATUS MODAL -->
 <div class="overlay" id="status-overlay">
   <div class="modal">
     <h3>Post Status</h3>
@@ -476,7 +469,6 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   </div>
 </div>
 
-<!-- CHAT INFO -->
 <div class="overlay" id="chatinfo-overlay">
   <div class="modal">
     <h3 id="chatinfo-title">Info</h3>
@@ -487,7 +479,6 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   </div>
 </div>
 
-<!-- EDIT PROFILE -->
 <div class="overlay" id="profile-overlay">
   <div class="modal">
     <h3>Edit Profile</h3>
@@ -509,7 +500,6 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   </div>
 </div>
 
-<!-- STATUS VIEWER -->
 <div class="sv" id="sv">
   <div class="sv-header">
     <div class="sv-bars" id="sv-bars"></div>
@@ -528,7 +518,6 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
   </div>
 </div>
 
-<!-- IMAGE VIEWER -->
 <div class="img-viewer" id="img-viewer">
   <button class="img-viewer-close" onclick="closeImgViewer()">✕</button>
   <img id="viewer-img" src="" alt=""/>
@@ -540,7 +529,7 @@ html,body{height:100%;overflow:hidden;font-family:'Outfit',sans-serif;background
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged, updateProfile
+  signOut, onAuthStateChanged, updateProfile, deleteUser
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
@@ -556,7 +545,7 @@ const FB={
   messagingSenderId:"1089455460888",
   appId:"1:1089455460888:web:15bd0820546c813febe96d"
 };
-const CLOUD_NAME="dzxckgbzp", CLOUD_PRESET="Odegaard";
+const CLOUD_NAME="dzxckgbzp",CLOUD_PRESET="Odegaard";
 const app=initializeApp(FB);
 const auth=getAuth(app);
 const db=getFirestore(app);
@@ -573,19 +562,14 @@ let svStatuses=[],svIdx=0,svProg=null;
 let gcMembers=[];
 const EMOJIS=['❤️','😂','😮','😢','👍','🔥','🎉','😍','💯','🙏'];
 
-// ── UTILS ──────────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
 function toast(msg,dur=2800,cb){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  t.onclick=cb||null;
+  t.textContent=msg;t.classList.add('show');t.onclick=cb||null;
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
 }
 function showErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.style.display='block';}}
 function hideErr(id){const e=document.getElementById(id);if(e)e.style.display='none';}
-
-// Safe timestamp formatter — never shows "Invalid Date"
 function fmtTime(ts){
   if(!ts)return'just now';
   try{
@@ -598,14 +582,12 @@ function fmtTime(ts){
     return d.toLocaleDateString([],{day:'2-digit',month:'short'});
   }catch(e){return'just now';}
 }
-
 function chatId(a,b){return[a,b].sort().join('_');}
 function secsLeft(ts){
   if(!ts)return 0;
   try{const d=ts.toDate?ts.toDate():new Date(ts);return Math.max(0,120-Math.floor((Date.now()-d.getTime())/1000));}
   catch(e){return 0;}
 }
-
 async function uploadCloud(file,folder='2k26dsa'){
   const fd=new FormData();
   fd.append('file',file);fd.append('upload_preset',CLOUD_PRESET);fd.append('folder',folder);
@@ -613,17 +595,16 @@ async function uploadCloud(file,folder='2k26dsa'){
   if(!res.ok)throw new Error('Upload failed');
   const d=await res.json();
   if(d.error)throw new Error(d.error.message);
-  if(!d.secure_url)throw new Error('No URL from Cloudinary');
+  if(!d.secure_url)throw new Error('No URL returned');
   return d.secure_url;
 }
 
-// ── SPLASH ─────────────────────────────────────────
+// SPLASH
 setTimeout(()=>{
   document.getElementById('splash').classList.add('hide');
   setTimeout(()=>{document.getElementById('splash').style.display='none';checkAuth();},650);
 },3200);
 
-// ── AUTH ───────────────────────────────────────────
 function checkAuth(){
   onAuthStateChanged(auth,async u=>{
     if(u){
@@ -638,7 +619,6 @@ function checkAuth(){
     }
   },()=>showAuth());
 }
-
 async function loadCUD(uid){
   const s=await getDoc(doc(db,'users',uid));
   CUD=s.exists()?s.data():{name:CU.displayName||'User',pfp:'',username:'',statusText:''};
@@ -662,7 +642,6 @@ window.switchTab=function(t){
   document.getElementById('signup-form').style.display=t==='signup'?'block':'none';
   document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(t==='login'&&i===0)||(t==='signup'&&i===1)));
 };
-
 window.previewPfp=function(i){pendingPfpFile=i.files[0];if(pendingPfpFile)document.getElementById('pfp-preview').innerHTML=`<img src="${URL.createObjectURL(pendingPfpFile)}"/>`;};
 window.previewGcIcon=function(i){pendingGcIconFile=i.files[0];if(pendingGcIconFile)document.getElementById('gc-icon-preview').innerHTML=`<img src="${URL.createObjectURL(pendingGcIconFile)}"/>`;};
 window.previewEditPfp=function(i){pendingEditPfpFile=i.files[0];if(pendingEditPfpFile)document.getElementById('edit-pfp-preview').innerHTML=`<img src="${URL.createObjectURL(pendingEditPfpFile)}"/>`;};
@@ -675,7 +654,7 @@ window.previewStatus=function(i){
     :`<img src="${url}" style="max-width:100%;border-radius:8px;max-height:160px"/>`;
 };
 
-// LOGIN — fixed: re-enables button on error, no stuck state
+// LOGIN
 window.doLogin=async function(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
@@ -685,7 +664,6 @@ window.doLogin=async function(){
   btn.disabled=true;btn.textContent='Logging in...';
   try{
     await signInWithEmailAndPassword(auth,email,pass);
-    // onAuthStateChanged will call showMain(), no need to do anything here
   }catch(e){
     const m={
       'auth/user-not-found':'No account with this email.',
@@ -695,11 +673,12 @@ window.doLogin=async function(){
       'auth/invalid-email':'Invalid email address.',
       'auth/too-many-requests':'Too many attempts. Try again later.'
     };
-    showErr('login-err',m[e.code]||('Error: '+e.message));
+    showErr('login-err',m[e.code]||e.message);
     btn.disabled=false;btn.textContent='Login';
   }
 };
 
+// SIGNUP — FIXED: create auth account FIRST then check username while authenticated
 window.doSignup=async function(){
   const username=document.getElementById('su-username').value.trim();
   const name=document.getElementById('su-name').value.trim();
@@ -709,26 +688,53 @@ window.doSignup=async function(){
   if(!username||username.length<3){showErr('su-err','Username must be 3+ characters.');return;}
   if(!name||!email||!pass){showErr('su-err','Fill all fields.');return;}
   if(pass.length<6){showErr('su-err','Password min 6 characters.');return;}
-  const btn=document.getElementById('su-btn');btn.disabled=true;btn.textContent='Checking...';
+  const btn=document.getElementById('su-btn');
+  btn.disabled=true;btn.textContent='Creating account...';
+  let cred=null;
   try{
-    const usnap=await getDocs(query(collection(db,'users'),where('username','==',username)));
-    if(!usnap.empty){showErr('su-err','Username already taken.');btn.disabled=false;btn.textContent='Create Account';return;}
-    btn.textContent='Creating account...';
-    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    // Step 1: Create Firebase Auth account first (so we are authenticated for Firestore)
+    cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
+
+    // Step 2: Now check username uniqueness (we are authenticated now)
+    btn.textContent='Checking username...';
+    const usnap=await getDocs(query(collection(db,'users'),where('username','==',username)));
+    if(!usnap.empty){
+      // Username taken — delete the auth account we just made and show error
+      await deleteUser(cred.user);
+      showErr('su-err','Username already taken. Try another.');
+      btn.disabled=false;btn.textContent='Create Account';
+      return;
+    }
+
+    // Step 3: Upload profile pic if chosen
     let pfpUrl='';
     if(pendingPfpFile){
       btn.textContent='Uploading photo...';
-      try{pfpUrl=await uploadCloud(pendingPfpFile,'pfps');await updateProfile(cred.user,{photoURL:pfpUrl});}
-      catch(ue){console.warn('PFP skip',ue);}
+      try{
+        pfpUrl=await uploadCloud(pendingPfpFile,'pfps');
+        await updateProfile(cred.user,{photoURL:pfpUrl});
+      }catch(ue){console.warn('PFP skip',ue);}
     }
+
+    // Step 4: Save user document
+    btn.textContent='Saving profile...';
     await setDoc(doc(db,'users',cred.user.uid),{
-      uid:cred.user.uid,name,email:email.toLowerCase(),username,
-      pfp:pfpUrl,statusText:'Hey there! I am on 2k26_DSA',
-      createdAt:serverTimestamp(),friends:[]
+      uid:cred.user.uid,
+      name,
+      email:email.toLowerCase(),
+      username,
+      pfp:pfpUrl,
+      statusText:'Hey there! I am on 2k26_DSA',
+      createdAt:serverTimestamp(),
+      friends:[]
     });
     toast('Welcome to 2k26_DSA! 🎉');
   }catch(e){
+    // If auth account was created but something else failed, clean up
+    if(cred?.user){
+      try{await deleteUser(cred.user);}catch(de){}
+    }
     const m={
       'auth/email-already-in-use':'Email already registered.',
       'auth/weak-password':'Password too weak.',
@@ -749,7 +755,6 @@ window.doLogout=async function(){
   showAuth();
 };
 
-// ── PROFILE ────────────────────────────────────────
 window.toggleProfileMenu=function(){document.getElementById('pmenu').classList.toggle('show');};
 document.addEventListener('click',e=>{
   if(!e.target.closest('#pmenu')&&!e.target.closest('#profile-btn'))document.getElementById('pmenu').classList.remove('show');
@@ -782,7 +787,6 @@ window.saveProfile=async function(){
   finally{btn.disabled=false;btn.textContent='Save';}
 };
 
-// ── FIND USER / FRIEND REQUEST ─────────────────────
 window.openFindUser=function(){
   document.getElementById('pmenu').classList.remove('show');
   document.getElementById('find-input').value='';
@@ -819,18 +823,15 @@ window.findUser=async function(){
       </div>`;
   }catch(e){showErr('find-err',e.message);}
 };
-
 window.sendFriendReq=async function(toUid,toName,toPfp,toUsername){
   try{
     await setDoc(doc(db,'requests',CU.uid+'_'+toUid),{
       from:CU.uid,fromName:CUD?.name||CU.displayName,fromPfp:CUD?.pfp||'',fromUsername:CUD?.username||'',
       to:toUid,toName,toPfp,toUsername,status:'pending',createdAt:serverTimestamp()
     });
-    toast('Friend request sent to @'+toUsername+' ✅');
-    window.findUser();
+    toast('Friend request sent to @'+toUsername+' ✅');window.findUser();
   }catch(e){toast('❌ '+e.message);}
 };
-
 window.openDMWithUid=async function(uid,name,pfp,username){
   const cid=chatId(CU.uid,uid);
   await setDoc(doc(db,'chats',cid),{
@@ -841,11 +842,9 @@ window.openDMWithUid=async function(uid,name,pfp,username){
     },
     lastMsg:'',lastTime:serverTimestamp(),unread:{}
   },{merge:true});
-  closeModal('find-overlay');
-  openChat(cid,'private');
+  closeModal('find-overlay');openChat(cid,'private');
 };
 
-// ── REQUESTS ───────────────────────────────────────
 function listenRequests(){
   if(reqUnsub)reqUnsub();
   const q=query(collection(db,'requests'),where('to','==',CU.uid),where('status','==','pending'));
@@ -857,24 +856,19 @@ function listenRequests(){
     else badge.classList.remove('show');
   });
 }
-
 function renderRequests(reqs){
   const pane=document.getElementById('pane-requests');
   if(!reqs.length){pane.innerHTML='<div class="empty-list"><div class="ei">👋</div>No pending requests</div>';return;}
   pane.innerHTML=reqs.map(r=>`
     <div class="req-item">
       <div class="ci-av" style="width:40px;height:40px;flex-shrink:0">${r.fromPfp?`<img src="${r.fromPfp}"/>`:(r.fromName||'?')[0].toUpperCase()}</div>
-      <div class="req-info">
-        <div class="req-name">${esc(r.fromName)}</div>
-        <div class="req-user">@${esc(r.fromUsername)}</div>
-      </div>
+      <div class="req-info"><div class="req-name">${esc(r.fromName)}</div><div class="req-user">@${esc(r.fromUsername)}</div></div>
       <div class="req-actions">
-        <button class="req-btn accept" onclick="acceptReq('${r.id}','${r.from}','${esc(r.fromName)}','${r.fromPfp||''}','${esc(r.fromUsername)}')">✓</button>
+        <button class="req-btn accept" onclick="acceptReq('${r.id}','${r.from}','${esc(r.fromName)}','${r.fromPfp||''}','${esc(r.fromUsername)}')">✓ Accept</button>
         <button class="req-btn decline" onclick="declineReq('${r.id}')">✕</button>
       </div>
     </div>`).join('');
 }
-
 window.acceptReq=async function(reqId,fromUid,fromName,fromPfp,fromUsername){
   try{
     await updateDoc(doc(db,'requests',reqId),{status:'accepted'});
@@ -898,7 +892,6 @@ window.declineReq=async function(reqId){
   catch(e){toast('❌ '+e.message);}
 };
 
-// ── CHATS ──────────────────────────────────────────
 function loadChats(){
   if(chatsUnsub)chatsUnsub();
   const q=query(collection(db,'chats'),where('members','array-contains',CU.uid));
@@ -908,14 +901,10 @@ function loadChats(){
     renderChatPane('pane-groups',all.filter(i=>i.type==='group'));
   });
 }
-
 function renderChatPane(paneId,items){
   const pane=document.getElementById(paneId);
   const isGroup=paneId==='pane-groups';
-  if(!items.length){
-    pane.innerHTML=`<div class="empty-list"><div class="ei">${isGroup?'👥':'💬'}</div>${isGroup?'No groups yet':'No chats yet. Add a friend!'}</div>`;
-    return;
-  }
+  if(!items.length){pane.innerHTML=`<div class="empty-list"><div class="ei">${isGroup?'👥':'💬'}</div>${isGroup?'No groups yet':'No chats yet. Add a friend!'}</div>`;return;}
   items.sort((a,b)=>(b.lastTime?.seconds||0)-(a.lastTime?.seconds||0));
   pane.innerHTML=items.map(item=>{
     let name='',pfp='',last=item.lastMsg||'';
@@ -934,7 +923,6 @@ function renderChatPane(paneId,items){
     </div>`;
   }).join('');
 }
-
 window.filterChats=function(val){
   document.querySelectorAll('.ci').forEach(el=>{
     el.style.display=el.querySelector('.ci-name').textContent.toLowerCase().includes(val.toLowerCase())?'':'none';
@@ -947,12 +935,11 @@ window.switchSideTab=function(tab,el){
   document.getElementById('pane-'+tab).classList.add('active');
 };
 
-// ── OPEN CHAT ─────────────────────────────────────
 window.openChat=async function(cid,type){
   activeChatId=cid;activeChatType=type;
   document.getElementById('sidebar').classList.add('hidden');
   document.getElementById('no-chat').style.display='none';
-  const ac=document.getElementById('active-chat');ac.style.display='flex';
+  document.getElementById('active-chat').style.display='flex';
   document.querySelectorAll('.ci').forEach(el=>el.classList.toggle('active',el.dataset.id===cid));
   const gcBanner=document.getElementById('gc-rules-banner');
   try{
@@ -981,7 +968,6 @@ window.openChat=async function(cid,type){
   }catch(e){console.error('openChat',e);}
   loadMessages(cid);
 };
-
 window.closeChat=function(){
   document.getElementById('sidebar').classList.remove('hidden');
   document.getElementById('active-chat').style.display='none';
@@ -990,9 +976,7 @@ window.closeChat=function(){
   activeChatId=null;cancelEdit();
 };
 
-// ── MESSAGES ───────────────────────────────────────
 const _msgCache={};
-
 function loadMessages(cid){
   if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
   const q=query(collection(db,'chats',cid,'messages'),orderBy('timestamp','asc'));
@@ -1011,13 +995,11 @@ function loadMessages(cid){
     });
   });
 }
-
 function renderMsgs(msgs){
   const c=document.getElementById('msgs');
   const atBot=c.scrollHeight-c.scrollTop-c.clientHeight<150;
   c.innerHTML=msgs.map(m=>renderMsg(m)).join('');
   if(atBot||msgs.length<=2)c.scrollTop=c.scrollHeight;
-  // start edit countdown timers
   msgs.forEach(m=>{
     if(m.senderId===CU.uid&&!m.deleted&&!m.edited&&m.timestamp){
       const sl=secsLeft(m.timestamp);
@@ -1037,41 +1019,28 @@ function renderMsgs(msgs){
     }
   });
 }
-
 function renderMsg(m){
   const isOut=m.senderId===CU.uid;
   if(m.deleted)return`<div class="mw ${isOut?'out':'in'}"><div class="mb deleted">🚫 Deleted</div><span class="m-time">${fmtTime(m.timestamp)}</span></div>`;
   const sl=secsLeft(m.timestamp);
   const attr=`oncontextmenu="showCtx(event,'${m.id}')" ondblclick="showCtx(event,'${m.id}')" id="msg_${m.id}"`;
   let content='';
-  if(m.type==='text'){
-    content=`<div class="mb${m.edited?' edited':''}" ${attr}>${formatText(esc(m.text||''))}</div>`;
-  }else if(m.type==='image'){
-    content=`<div class="mb" ${attr}><img class="m-img" src="${m.url}" onclick="openImgViewer('${m.url}')"/></div>`;
-  }else if(m.type==='audio'){
-    content=`<div class="mb m-audio" ${attr}><audio controls src="${m.url}" style="width:210px"></audio></div>`;
-  }
+  if(m.type==='text')content=`<div class="mb${m.edited?' edited':''}" ${attr}>${formatText(esc(m.text||''))}</div>`;
+  else if(m.type==='image')content=`<div class="mb" ${attr}><img class="m-img" src="${m.url}" onclick="openImgViewer('${m.url}')"/></div>`;
+  else if(m.type==='audio')content=`<div class="mb m-audio" ${attr}><audio controls src="${m.url}" style="width:210px"></audio></div>`;
   const reactions=m.reactions||{};
   const rHtml=Object.entries(reactions).filter(([,v])=>v?.length).map(([e,u])=>
     `<div class="rpill${u.includes(CU.uid)?' mine':''}" onclick="reactMsg('${m.id}','${e}')">${e}<span class="rc">${u.length}</span></div>`).join('');
   const sName=!isOut&&activeChatType==='group'?`<div class="m-sender">${esc(m.senderName||'')}</div>`:'';
-  // Edit timer: show for 2 min window, own msgs only, not yet edited
   const timerHtml=isOut&&!m.edited&&sl>0?`<span class="edit-timer" id="etimer_${m.id}">✏️ ${sl}s</span>`:'';
   return`<div class="mw ${isOut?'out':'in'}">${sName}${content}${rHtml?`<div class="m-reactions">${rHtml}</div>`:''}<span class="m-time">${fmtTime(m.timestamp)}</span>${timerHtml}</div>`;
 }
+function formatText(txt){return txt.replace(/@(\w+)/g,'<span class="tag-highlight">@$1</span>');}
 
-function formatText(txt){
-  return txt.replace(/@(\w+)/g,'<span class="tag-highlight">@$1</span>');
-}
-
-// ── SEND MESSAGE ──────────────────────────────────
 window.sendMessage=async function(){
   if(!activeChatId)return;
   const ta=document.getElementById('msg-txt');
-  const txt=ta.value.trim();
-  if(!txt)return;
-
-  // EDIT MODE
+  const txt=ta.value.trim();if(!txt)return;
   if(editingMsgId){
     try{
       const mRef=doc(db,'chats',activeChatId,'messages',editingMsgId);
@@ -1082,8 +1051,6 @@ window.sendMessage=async function(){
     }catch(e){toast('❌ '+e.message);}
     cancelEdit();ta.value='';autoResize(ta);return;
   }
-
-  // Resolve @tags to UIDs (for notifications)
   let tags=[];
   if(activeChatType==='group'){
     const tagMatches=[...txt.matchAll(/@(\w+)/g)].map(m=>m[1]);
@@ -1094,7 +1061,6 @@ window.sendMessage=async function(){
       }catch(e){}
     }
   }
-
   ta.value='';autoResize(ta);
   try{
     await addDoc(collection(db,'chats',activeChatId,'messages'),{
@@ -1107,7 +1073,6 @@ window.sendMessage=async function(){
   }catch(e){toast('❌ '+e.message);}
 };
 window.handleEnter=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}};
-
 async function updateChatMeta(lastMsg){
   if(!activeChatId)return;
   try{
@@ -1118,11 +1083,9 @@ async function updateChatMeta(lastMsg){
     await updateDoc(doc(db,'chats',activeChatId),{lastMsg,lastTime:serverTimestamp(),unread});
   }catch(e){}
 }
-
 window.sendMedia=async function(input){
   if(!activeChatId||!input.files[0])return;
-  const file=input.files[0];
-  toast('Uploading... 📤');
+  const file=input.files[0];toast('Uploading... 📤');
   try{
     const url=await uploadCloud(file,'media');
     await addDoc(collection(db,'chats',activeChatId,'messages'),{
@@ -1136,7 +1099,6 @@ window.sendMedia=async function(input){
   input.value='';
 };
 
-// ── VOICE NOTE ────────────────────────────────────
 window.toggleVN=async function(){
   if(mediaRecorder&&mediaRecorder.state==='recording'){stopAndSendVN();return;}
   try{
@@ -1148,7 +1110,7 @@ window.toggleVN=async function(){
       if(!recChunks.length)return;
       const blob=new Blob(recChunks,{type:'audio/webm'});
       const file=new File([blob],`vn_${Date.now()}.webm`,{type:'audio/webm'});
-      toast('Sending voice note... 🎤');
+      toast('Sending voice note...');
       try{
         const url=await uploadCloud(file,'voicenotes');
         await addDoc(collection(db,'chats',activeChatId,'messages'),{
@@ -1156,8 +1118,7 @@ window.toggleVN=async function(){
           senderName:CUD?.name||CU.displayName||'User',
           timestamp:serverTimestamp(),reactions:{},tags:[],deleted:false,edited:false
         });
-        await updateChatMeta('🎤 Voice note');
-        toast('Sent ✅');
+        await updateChatMeta('🎤 Voice note');toast('Sent ✅');
       }catch(e){toast('❌ VN failed: '+e.message);}
     };
     mediaRecorder.start();startRecTimer();
@@ -1182,7 +1143,6 @@ function startRecTimer(){
 }
 function stopRecTimer(){clearInterval(recTimer);recTimer=null;recSeconds=0;}
 
-// ── CONTEXT MENU ──────────────────────────────────
 window.showCtx=function(e,msgId){
   e.preventDefault();
   ctxMsgId=msgId;ctxMsgData=_msgCache[msgId];
@@ -1191,29 +1151,25 @@ window.showCtx=function(e,msgId){
   const isAdmin=activeChatType==='group'&&activeChatData?.admins?.includes(CU.uid);
   const canEdit=isOwn&&!ctxMsgData?.deleted&&!ctxMsgData?.edited&&secsLeft(ctxMsgData?.timestamp)>0&&ctxMsgData?.type==='text';
   document.getElementById('ctx-edit').style.display=canEdit?'flex':'none';
-  // Own messages can always be deleted by owner; admin can delete anyone's in GC
   document.getElementById('ctx-delete').style.display=isOwn&&!ctxMsgData?.deleted?'flex':'none';
-  document.getElementById('ctx-admin-delete').style.display=(isAdmin&&!isOwn&&!ctxMsgData?.deleted)?'flex':'none';
+  document.getElementById('ctx-admin-delete').style.display=isAdmin&&!isOwn&&!ctxMsgData?.deleted?'flex':'none';
   menu.style.left=Math.min(e.clientX,window.innerWidth-170)+'px';
   menu.style.top=Math.min(e.clientY,window.innerHeight-180)+'px';
   menu.classList.add('show');
 };
 function hideCtxMenu(){document.getElementById('msg-ctx-menu').classList.remove('show');ctxMsgId=null;}
-
 window.showEmojiFromCtx=function(){
   if(!ctxMsgId)return;
   const menu=document.getElementById('msg-ctx-menu');
   const ep=document.getElementById('global-ep');
   ep.innerHTML=EMOJIS.map(e=>`<button onclick="reactMsg('${ctxMsgId}','${e}');document.getElementById('global-ep').classList.remove('show')">${e}</button>`).join('');
-  ep.style.left=menu.style.left;
-  ep.style.top=(parseInt(menu.style.top)-68)+'px';
+  ep.style.left=menu.style.left;ep.style.top=(parseInt(menu.style.top)-68)+'px';
   ep.classList.add('show');hideCtxMenu();
 };
-
 window.startEdit=function(){
   if(!ctxMsgId||!ctxMsgData)return;
   if(ctxMsgData.senderId!==CU.uid){hideCtxMenu();return;}
-  if(secsLeft(ctxMsgData.timestamp)===0){toast('⏰ Edit window closed (2 min limit)');hideCtxMenu();return;}
+  if(secsLeft(ctxMsgData.timestamp)===0){toast('⏰ Edit window closed');hideCtxMenu();return;}
   editingMsgId=ctxMsgId;
   document.getElementById('msg-txt').value=ctxMsgData.text||'';
   document.getElementById('edit-preview').textContent=ctxMsgData.text||'';
@@ -1221,26 +1177,17 @@ window.startEdit=function(){
   document.getElementById('msg-txt').focus();
   hideCtxMenu();
 };
-window.cancelEdit=function(){
-  editingMsgId=null;
-  document.getElementById('edit-bar').classList.remove('show');
-  document.getElementById('msg-txt').value='';
-};
-
-// Users can delete their own messages anytime (DM or GC)
+window.cancelEdit=function(){editingMsgId=null;document.getElementById('edit-bar').classList.remove('show');document.getElementById('msg-txt').value='';};
 window.deleteMsg=async function(){
   if(!ctxMsgId||!activeChatId)return;hideCtxMenu();
   try{await updateDoc(doc(db,'chats',activeChatId,'messages',ctxMsgId),{deleted:true,text:'',url:''});toast('Message deleted');}
   catch(e){toast('❌ '+e.message);}
 };
-// Admins can delete anyone's message in GC
 window.adminDeleteMsg=async function(){
   if(!ctxMsgId||!activeChatId)return;hideCtxMenu();
   try{await updateDoc(doc(db,'chats',activeChatId,'messages',ctxMsgId),{deleted:true,text:'',url:''});toast('Deleted');}
   catch(e){toast('❌ '+e.message);}
 };
-
-// ── REACTIONS ─────────────────────────────────────
 window.reactMsg=async function(msgId,emoji){
   if(!activeChatId)return;
   try{
@@ -1252,7 +1199,6 @@ window.reactMsg=async function(msgId,emoji){
   }catch(e){}
 };
 
-// ── TAGGING ───────────────────────────────────────
 window.handleInput=function(el){
   autoResize(el);
   const before=el.value.slice(0,el.selectionStart);
@@ -1293,15 +1239,11 @@ window.insertTag=function(username){
   hideTagSuggest();
 };
 
-// ── GROUP CREATION ────────────────────────────────
 window.openGcModal=function(){
   gcMembersToAdd=[];gcRulesArr=[];
-  document.getElementById('gc-name').value='';
-  document.getElementById('gc-desc').value='';
-  document.getElementById('gc-members-list').innerHTML='';
-  document.getElementById('rules-preview').innerHTML='';
-  document.getElementById('gc-icon-preview').innerHTML='👥';
-  pendingGcIconFile=null;hideErr('gc-err');
+  document.getElementById('gc-name').value='';document.getElementById('gc-desc').value='';
+  document.getElementById('gc-members-list').innerHTML='';document.getElementById('rules-preview').innerHTML='';
+  document.getElementById('gc-icon-preview').innerHTML='👥';pendingGcIconFile=null;hideErr('gc-err');
   document.getElementById('gc-overlay').classList.add('show');
 };
 window.addGcMember=async function(){
@@ -1311,8 +1253,7 @@ window.addGcMember=async function(){
     const snap=await getDocs(query(collection(db,'users'),where('username','==',uname)));
     if(snap.empty){toast('@'+uname+' not found.');return;}
     gcMembersToAdd.push(snap.docs[0].data());
-    document.getElementById('gc-member-input').value='';
-    renderGcMembers();
+    document.getElementById('gc-member-input').value='';renderGcMembers();
   }catch(e){toast('❌ '+e.message);}
 };
 function renderGcMembers(){
@@ -1350,7 +1291,6 @@ window.createGroup=async function(){
   finally{btn.disabled=false;btn.textContent='Create Group';}
 };
 
-// ── CHAT INFO / ADMIN TOOLS ───────────────────────
 window.openChatInfo=async function(){
   if(!activeChatId)return;
   const title=document.getElementById('chatinfo-title');
@@ -1370,7 +1310,6 @@ window.openChatInfo=async function(){
           ${isAdmin&&uid!==CU.uid?`<button onclick="adminRemoveMember('${uid}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px;padding:2px 6px">Remove</button>`:''}
         </div>`).join('');
       const rulesHtml=d.rules?.length?`<div style="margin-top:14px"><strong style="font-size:12px;color:var(--accent)">📋 Rules</strong><ul class="rules-list" style="margin-top:6px">${d.rules.map(r=>`<li class="rule-item">📌 ${esc(r)}</li>`).join('')}</ul></div>`:'';
-      // Admin tools: add member, add rule
       const adminHtml=isAdmin?`<div style="margin-top:16px"><strong style="font-size:12px;color:var(--accent)">⚙️ Admin Tools</strong>
         <div style="display:flex;gap:7px;margin-top:8px">
           <input type="text" id="admin-add-input" placeholder="@username to add" style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit;font-size:12px;outline:none" oninput="this.value=this.value.replace(/[^a-z0-9_@]/g,'').toLowerCase()"/>
@@ -1397,7 +1336,6 @@ window.openChatInfo=async function(){
   }catch(e){content.innerHTML='<p style="color:var(--danger)">Failed to load.</p>';}
   document.getElementById('chatinfo-overlay').classList.add('show');
 };
-
 window.adminAddMember=async function(){
   const uname=document.getElementById('admin-add-input')?.value.trim().replace('@','');
   if(!uname||!activeChatId)return;
@@ -1412,10 +1350,8 @@ window.adminAddMember=async function(){
 };
 window.adminRemoveMember=async function(uid){
   if(!activeChatId)return;
-  try{
-    await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(uid)});
-    toast('Member removed');openChatInfo();
-  }catch(e){toast('❌ '+e.message);}
+  try{await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(uid)});toast('Member removed');openChatInfo();}
+  catch(e){toast('❌ '+e.message);}
 };
 window.adminAddRule=async function(){
   const rule=document.getElementById('admin-rule-input')?.value.trim();
@@ -1425,13 +1361,10 @@ window.adminAddRule=async function(){
 };
 window.leaveGroup=async function(){
   if(!activeChatId)return;
-  try{
-    await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(CU.uid)});
-    closeModal('chatinfo-overlay');closeChat();toast('You left the group');
-  }catch(e){toast('❌ '+e.message);}
+  try{await updateDoc(doc(db,'chats',activeChatId),{members:arrayRemove(CU.uid)});closeModal('chatinfo-overlay');closeChat();toast('You left the group');}
+  catch(e){toast('❌ '+e.message);}
 };
 
-// ── NOTIFICATIONS ─────────────────────────────────
 function listenNotifications(){
   if(!CU)return;
   const q=query(collection(db,'notifications'),where('to','==',CU.uid),where('read','==',false));
@@ -1445,7 +1378,6 @@ function listenNotifications(){
   });
 }
 
-// ── STATUS ────────────────────────────────────────
 window.openStatusModal=function(){
   pendingStatusFile=null;
   document.getElementById('status-preview').innerHTML='';
@@ -1453,22 +1385,16 @@ window.openStatusModal=function(){
   hideErr('status-err');
   document.getElementById('status-overlay').classList.add('show');
 };
-
 window.postStatus=async function(){
   hideErr('status-err');
   if(!pendingStatusFile){showErr('status-err','Choose a photo or video.');return;}
   const btn=document.getElementById('status-post-btn');
   btn.disabled=true;btn.textContent='Uploading...';
   try{
-    // Upload first — never save empty URL
     const url=await uploadCloud(pendingStatusFile,'statuses');
-    if(!url)throw new Error('Upload returned no URL');
     await addDoc(collection(db,'statuses'),{
-      uid:CU.uid,
-      name:CUD?.name||CU.displayName||'User',
-      pfp:CUD?.pfp||'',
-      url,
-      caption:document.getElementById('status-caption').value.trim(),
+      uid:CU.uid,name:CUD?.name||CU.displayName||'User',pfp:CUD?.pfp||'',
+      url,caption:document.getElementById('status-caption').value.trim(),
       mediaType:pendingStatusFile.type.startsWith('video')?'video':'image',
       timestamp:serverTimestamp(),
       expiresAt:Timestamp.fromMillis(Date.now()+24*3600*1000),
@@ -1482,38 +1408,27 @@ window.postStatus=async function(){
 
 async function loadStatuses(){
   try{
-    // Fetch all statuses, filter client-side to avoid index requirement
     const snap=await getDocs(collection(db,'statuses'));
     const now=Date.now();
     const all=snap.docs.map(d=>({id:d.id,...d.data()})).filter(s=>{
       if(!s.expiresAt)return false;
-      try{
-        const exp=s.expiresAt.toDate?s.expiresAt.toDate():new Date(s.expiresAt);
-        return exp.getTime()>now;
-      }catch(e){return false;}
+      try{const exp=s.expiresAt.toDate?s.expiresAt.toDate():new Date(s.expiresAt);return exp.getTime()>now;}
+      catch(e){return false;}
     });
     renderStatuses(all);
   }catch(e){console.error('loadStatuses',e);}
 }
-
 function renderStatuses(all){
   const row=document.getElementById('status-row');
-  // Separate mine from others
   const mine=all.filter(s=>s.uid===CU.uid);
   const byUser={};
-  all.filter(s=>s.uid!==CU.uid).forEach(s=>{
-    if(!byUser[s.uid])byUser[s.uid]=[];
-    byUser[s.uid].push(s);
-  });
-
-  // My status bubble — always visible, shows avatar if I posted
-  const myAv=CUD?.pfp?`<img src="${CUD.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`:( CUD?.name?.[0]?.toUpperCase()||'👤');
+  all.filter(s=>s.uid!==CU.uid).forEach(s=>{if(!byUser[s.uid])byUser[s.uid]=[];byUser[s.uid].push(s);});
+  const myAv=CUD?.pfp?`<img src="${CUD.pfp}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`:(CUD?.name?.[0]?.toUpperCase()||'👤');
   const myClick=mine.length?`viewStatus(${JSON.stringify(mine).replace(/"/g,'&quot;')})`:'openStatusModal()';
   const myHtml=`<div class="st-item" onclick="${myClick}">
     <div class="st-ring${mine.length?' st-mine':' add-btn'}">${mine.length?myAv:'＋'}</div>
     <span>${mine.length?'My Status':'Add Status'}</span>
   </div>`;
-
   const othersHtml=Object.entries(byUser).map(([uid,statuses])=>{
     const s=statuses[0];
     return`<div class="st-item" onclick='viewStatus(${JSON.stringify(statuses).replace(/'/g,"&#39;")})'>
@@ -1521,23 +1436,16 @@ function renderStatuses(all){
       <span>${esc(s.name||'')}</span>
     </div>`;
   }).join('');
-
   row.innerHTML=myHtml+othersHtml;
 }
 
 window.viewStatus=function(statuses){
   svStatuses=Array.isArray(statuses)?statuses:JSON.parse(statuses);
-  svIdx=0;
-  document.getElementById('sv').classList.add('show');
-  showSVAt(0);
+  svIdx=0;document.getElementById('sv').classList.add('show');showSVAt(0);
 };
-
 async function showSVAt(i){
   if(i>=svStatuses.length){closeSV();return;}
-  svIdx=i;
-  const s=svStatuses[i];
-
-  // Render media — FIXED: properly display image OR video
+  svIdx=i;const s=svStatuses[i];
   const mediaEl=document.getElementById('sv-media');
   if(s.url){
     if(s.mediaType==='video'){
@@ -1545,21 +1453,14 @@ async function showSVAt(i){
     }else{
       mediaEl.innerHTML=`<img src="${s.url}" style="width:100%;height:100%;object-fit:contain"/>`;
     }
-  }else{
-    mediaEl.innerHTML='<p style="color:#fff;opacity:0.4">No media</p>';
-  }
-
-  // Header info
+  }else{mediaEl.innerHTML='';}
   document.getElementById('sv-name').textContent=s.name||'';
   const avEl=document.getElementById('sv-av');
   if(s.pfp){avEl.src=s.pfp;avEl.style.display='block';}else{avEl.style.display='none';}
   document.getElementById('sv-time').textContent=fmtTime(s.timestamp);
   document.getElementById('sv-caption').textContent=s.caption||'';
-
   const isMine=s.uid===CU.uid;
   document.getElementById('sv-delete-btn').style.display=isMine?'inline-block':'none';
-
-  // Viewer count for owner; record view for others
   const viewersEl=document.getElementById('sv-viewers');
   if(isMine){
     const cnt=s.viewers?.length||0;
@@ -1568,26 +1469,20 @@ async function showSVAt(i){
     viewersEl.innerHTML='';
     try{await updateDoc(doc(db,'statuses',s.id),{viewers:arrayUnion(CU.uid)});}catch(e){}
   }
-
-  // Progress bars
   const bars=document.getElementById('sv-bars');
   bars.innerHTML=svStatuses.map((_,j)=>`<div class="sv-bar"><div class="sv-fill" id="svfill_${j}" style="width:${j<i?'100':'0'}%"></div></div>`).join('');
   clearTimeout(svProg);
-  // Animate current bar
   requestAnimationFrame(()=>{
     const fill=document.getElementById('svfill_'+i);
     if(fill){fill.style.transition='width 5s linear';fill.style.width='100%';}
   });
   svProg=setTimeout(()=>showSVAt(i+1),5100);
 }
-
 window.closeSV=function(){
   clearTimeout(svProg);
   document.getElementById('sv').classList.remove('show');
-  // Stop any playing video
   document.getElementById('sv-media').innerHTML='';
 };
-
 window.deleteStatus=async function(){
   const s=svStatuses[svIdx];
   if(!s||s.uid!==CU.uid)return;
@@ -1600,17 +1495,14 @@ window.deleteStatus=async function(){
   }catch(e){toast('❌ '+e.message);}
 };
 
-// ── IMAGE VIEWER ──────────────────────────────────
 window.openImgViewer=function(url){document.getElementById('viewer-img').src=url;document.getElementById('img-viewer').classList.add('show');};
 window.closeImgViewer=function(){document.getElementById('img-viewer').classList.remove('show');};
 document.getElementById('img-viewer').addEventListener('click',function(e){if(e.target===this)closeImgViewer();});
 
-// ── MODALS ────────────────────────────────────────
 window.closeModal=function(id){document.getElementById(id).classList.remove('show');};
 document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);}));
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
 
-// ── ONLINE PRESENCE ───────────────────────────────
 async function setOnline(){if(!CU)return;try{await setDoc(doc(db,'users',CU.uid),{lastSeen:serverTimestamp()},{merge:true});}catch(e){}}
 setInterval(setOnline,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setOnline();});
