@@ -788,14 +788,20 @@ window.doSignup=async function(){
   if(!name||!email||!pass){showErr('su-err','Fill all fields.');return;}
   if(pass.length<6){showErr('su-err','Password min 6 characters.');return;}
   const btn=document.getElementById('su-btn');
-  btn.disabled=true;btn.textContent='Checking username...';
+  btn.disabled=true;btn.textContent='Creating account...';
   let cred=null;
   try{
-    const usnap=await getDocs(query(collection(db,'users'),where('username','==',username)));
-    if(!usnap.empty){showErr('su-err','Username taken. Try another.');btn.disabled=false;btn.textContent='Create Account';return;}
-    btn.textContent='Creating account...';
+    // Create auth account first so user is authenticated before Firestore queries
     cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
+    // Now check username (user is authenticated so Firestore rules pass)
+    btn.textContent='Checking username...';
+    const usnap=await getDocs(query(collection(db,'users'),where('username','==',username)));
+    if(!usnap.empty){
+      await deleteUser(cred.user);
+      showErr('su-err','Username taken. Try another.');
+      btn.disabled=false;btn.textContent='Create Account';return;
+    }
     let pfpUrl='';
     if(pendingPfpFile){
       btn.textContent='Uploading photo...';
