@@ -879,7 +879,6 @@ window.switchSideTab=function(tab,el){
 window.openChat=async function(cid,type){
   if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
   document.getElementById('msgs').innerHTML='';
-  // FIX Bug 3: Reset all UI immediately before any awaits to prevent stale UI leaking between chats
   document.getElementById('gc-rules-banner').classList.remove('show');
   document.getElementById('gc-rules-text').textContent='';
   document.getElementById('ch-name').textContent='Loading...';
@@ -934,7 +933,6 @@ const _msgCache={};
 function loadMessages(cid){
   if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
   document.getElementById('msgs').innerHTML='';
-  // FIX Bug 4: Capture chatType at load time so switching chats can't corrupt message rendering
   const capturedType=activeChatType;
   const q=query(collection(db,'chats',cid,'messages'),orderBy('timestamp','asc'));
   msgsUnsub=onSnapshot(q,snap=>{
@@ -989,7 +987,6 @@ function renderMsg(m,chatType){
   const reactions=m.reactions||{};
   const rHtml=Object.entries(reactions).filter(([,v])=>v?.length).map(([e,u])=>
     `<div class="rpill${u.includes(CU.uid)?' mine':''}" onclick="reactMsg('${m.id}','${e}')">${e}<span class="rc">${u.length}</span></div>`).join('');
-  // FIX Bug 4: Use captured chatType param instead of global activeChatType
   const sName=!isOut&&chatType==='group'?`<div class="m-sender">${esc(m.senderName||'')}</div>`:'';
   const timerHtml=isOut&&!m.edited&&sl>0?`<span class="edit-timer" id="etimer_${m.id}">✏️ ${sl}s</span>`:'';
   return`<div class="mw ${isOut?'out':'in'}">${sName}${content}${rHtml?`<div class="m-reactions">${rHtml}</div>`:''}<span class="m-time">${fmtTime(m.timestamp)}</span>${timerHtml}</div>`;
@@ -1134,28 +1131,37 @@ window.startEdit=function(){
 };
 window.cancelEdit=function(){editingMsgId=null;document.getElementById('edit-bar').classList.remove('show');document.getElementById('msg-txt').value='';};
 
+// ✅ FIX: Save msgId and chatId BEFORE hideCtxMenu() nulls them
 window.deleteMsg=async function(){
   if(!ctxMsgId||!activeChatId)return;
+  const msgId=ctxMsgId;
+  const cid=activeChatId;
   hideCtxMenu();
   try{
-    const mRef=doc(db,'chats',activeChatId,'messages',ctxMsgId);
+    const mRef=doc(db,'chats',cid,'messages',msgId);
     const snap=await getDoc(mRef);
     if(!snap.exists())return;
     await updateDoc(mRef,{deleted:true,text:'',url:''});
     toast('Message deleted');
   }catch(e){toast('❌ '+e.message);}
 };
+
+// ✅ FIX: Same fix applied to adminDeleteMsg
 window.adminDeleteMsg=async function(){
   if(!ctxMsgId||!activeChatId)return;
+  const msgId=ctxMsgId;
+  const cid=activeChatId;
   hideCtxMenu();
   try{
-    const mRef=doc(db,'chats',activeChatId,'messages',ctxMsgId);
+    const mRef=doc(db,'chats',cid,'messages',msgId);
     const snap=await getDoc(mRef);
     if(!snap.exists())return;
     await updateDoc(mRef,{deleted:true,text:'',url:''});
     toast('Deleted');
   }catch(e){toast('❌ '+e.message);}
 };
+
+// ✅ FIX: Added error toast so reaction failures are visible
 window.reactMsg=async function(msgId,emoji){
   if(!activeChatId)return;
   try{
@@ -1164,7 +1170,7 @@ window.reactMsg=async function(msgId,emoji){
     const users=snap.data().reactions?.[emoji]||[];
     if(users.includes(CU.uid))await updateDoc(mRef,{[`reactions.${emoji}`]:arrayRemove(CU.uid)});
     else await updateDoc(mRef,{[`reactions.${emoji}`]:arrayUnion(CU.uid)});
-  }catch(e){}
+  }catch(e){toast('❌ React failed: '+e.message);}
 };
 
 window.handleInput=function(el){
