@@ -984,15 +984,26 @@ const spStepTimer = setInterval(() => {
   if (spStepEl && spStepIdx < spSteps.length) spStepEl.textContent = spSteps[spStepIdx];
   if (spStepIdx >= spSteps.length - 1) clearInterval(spStepTimer);
 }, 600);
-setTimeout(() => {
+function hideSplash() {
   clearInterval(spStepTimer);
+  const el = document.getElementById('splash');
+  if (!el || el.style.display === 'none') return;
   if (spStepEl) spStepEl.textContent = 'Welcome! ✨';
-  document.getElementById('splash').classList.add('hide');
-  setTimeout(() => { document.getElementById('splash').style.display = 'none'; checkAuth(); }, 600);
-}, 3200);
+  el.classList.add('hide');
+  setTimeout(() => { el.style.display = 'none'; checkAuth(); }, 600);
+}
+setTimeout(hideSplash, 3200);
 
 function checkAuth(){
-  onAuthStateChanged(auth,async u=>{
+  let resolved = false;
+  // Hard fallback — if Firebase doesn't respond in 5s, go to auth anyway
+  const fallback = setTimeout(() => {
+    if (!resolved) { resolved = true; showAuth(); }
+  }, 5000);
+  onAuthStateChanged(auth, async u => {
+    if (resolved) return;
+    resolved = true;
+    clearTimeout(fallback);
     if(u){
       CU=u;
       try{await loadCUD(u.uid);}catch(e){
@@ -1001,7 +1012,7 @@ function checkAuth(){
       }
       showMain();
     }else{showAuth();}
-  },()=>showAuth());
+  }, () => { if(!resolved){resolved=true; clearTimeout(fallback); showAuth();} });
 }
 async function loadCUD(uid){
   const s=await getDoc(doc(db,'users',uid));
