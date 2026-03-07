@@ -2596,21 +2596,12 @@ window.switchSideTab=function(tab,el){
 
 function renderContactsTab(){
   const pane=document.getElementById('pane-contacts');
-  const supported='contacts' in navigator && 'ContactsManager' in window;
-  pane.innerHTML=`
-    <div class="contacts-header">
-      <button class="contacts-header-btn" onclick="loadPhoneContacts()">
-        📱 ${supported?'Browse Phone Contacts':'Find Friends'}
-      </button>
-    </div>
-    <div id="contacts-list">
-      <div class="contacts-note">
-        ${supported
-          ?'Tap above to find which of your contacts are on 2k26_DSA. Works on Android Chrome.'
-          :'Your browser doesn't support the Contact Picker yet.
-Use <strong>Find User</strong> to search by username instead.'}
-      </div>
-    </div>`;
+  const supported=('contacts' in navigator)&&('ContactsManager' in window);
+  const btn=supported?'Browse Phone Contacts':'Find Friends';
+  const note=supported
+    ?'Tap above to match your contacts with 2k26_DSA users. Works on Android Chrome.'
+    :'Contact Picker is not supported on this browser. Use Find User to search by username.';
+  pane.innerHTML='<div class="contacts-header"><button class="contacts-header-btn" onclick="loadPhoneContacts()">'+btn+'</button></div><div id="contacts-list"><div class="contacts-note">'+note+'</div></div>';
 }
 
 window.loadPhoneContacts=async function(){
