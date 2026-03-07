@@ -1470,7 +1470,7 @@ function renderMsg(m,chatType){
   let content='';
   if(m.type==='text')content=`<div class="mb${m.edited?' edited':''}" ${attr}>${formatText(esc(m.text||''))}</div>`;
   else if(m.type==='sticker')content=`<div class="mb m-sticker" ${attr}><img src="${m.url}" style="width:100px;height:100px;object-fit:contain;display:block"/></div>`;
-  else if(m.type==='image')content=`<div class="mb" ${attr}><img class="m-img" src="${m.url}" onclick="openImgViewer('${m.url}')" oncontextmenu="showImgCtx(event,'${m.url}','${esc(m.senderName||'')}','${fmtTime(m.timestamp)}')" onlongpress="showImgCtx(event,'${m.url}','${esc(m.senderName||'')}','${fmtTime(m.timestamp)}')" style="touch-action:none"/></div>`;
+  else if(m.type==='image')content=`<div class="mb" ${attr}><img class="m-img" src="${m.url}" onclick="openImgViewer('${m.url}')" data-sender="${esc(m.senderName||'')}" data-msgid="${m.id}"/></div>`;
   else if(m.type==='audio')content=`<div class="mb m-audio" ${attr}><audio controls src="${m.url}" style="width:210px"></audio></div>`;
   const reactions=m.reactions||{};
   const rHtml=Object.entries(reactions).filter(([,v])=>v?.length).map(([e,u])=>
@@ -2506,15 +2506,16 @@ let _imgCtxUrl='',_imgCtxMsgId='';
 // Override openImgViewer to use long press instead
 document.addEventListener('touchstart',e=>{
   const img=e.target.closest('.m-img');
-  if(!img)return;
-  const mw=img.closest('.mw');
-  const msgId=mw?.dataset?.msgid||'';
-  const url=img.src;
-  _imgLongTimer=setTimeout(()=>{
-    // prevent swipe from triggering
-    swipeTouchStart=null;swipeMsgEl=null;
-    showImgCtx(null,url,mw?.querySelector('.m-sender')?.textContent||'',msgId);
-  },500);
+  if(img){
+    const url=img.src;
+    const sender=img.dataset.sender||'';
+    const msgId=img.dataset.msgid||'';
+    _imgLongTimer=setTimeout(()=>{
+      swipeTouchStart=null;swipeMsgEl=null;
+      showImgCtx(null,url,sender,msgId);
+    },500);
+    return;
+  }
 },{passive:true});
 let _imgLongTimer=null;
 document.addEventListener('touchend',()=>clearTimeout(_imgLongTimer),{passive:true});
