@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <title>2k26_DSA</title>
+<link rel="manifest" href="data:application/json,{%22name%22:%222k26_DSA%22,%22short_name%22:%222k26%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23075E54%22,%22theme_color%22:%22%23128C7E%22,%22icons%22:[{%22src%22:%22https://image2url.com/r2/default/images/1772295169769-b92423f9-499f-4178-942f-409c094d9380.jpg%22,%22sizes%22:%22192x192%22,%22type%22:%22image/jpeg%22}]}"/>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -446,6 +448,55 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
   .sidebar.hidden{transform:translateX(-100%)}
   .back-btn{display:block}
 }
+
+/* ── STICKER PANEL ── */
+.sticker-panel{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,0.15);z-index:400;max-height:55vh;flex-direction:column;animation:slideUp 0.25s ease}
+.sticker-panel.show{display:flex}
+.sp-header{display:flex;align-items:center;padding:10px 14px 0;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.sp-header::-webkit-scrollbar{display:none}
+.sp-tab{padding:8px 14px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all 0.2s}
+.sp-tab.active{color:#128C7E;border-bottom-color:#128C7E}
+.sp-body{flex:1;overflow-y:auto;padding:10px}
+.sticker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sticker-item{aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--bg3);transition:transform 0.15s;position:relative}
+.sticker-item:active{transform:scale(0.9)}
+.sticker-item img{width:100%;height:100%;object-fit:contain;padding:4px}
+.sticker-item .sticker-fav-btn{display:none;position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);border:none;color:#fff;font-size:10px;width:18px;height:18px;border-radius:50%;cursor:pointer;align-items:center;justify-content:center}
+.sticker-item:hover .sticker-fav-btn{display:flex}
+.sticker-empty{text-align:center;padding:30px 20px;color:var(--text2);font-size:13px}
+/* Sticker message - no bubble, just floating */
+.m-sticker{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important}
+.m-sticker img{width:100px;height:100px;object-fit:contain;display:block}
+
+/* ── IMAGE CONTEXT MENU (WA style bottom sheet) ── */
+.img-ctx-sheet{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5)}
+.img-ctx-sheet.show{display:block}
+.img-ctx-inner{position:absolute;bottom:0;left:0;right:0;background:#1C1C1E;border-radius:16px 16px 0 0;padding:8px 0 calc(20px + var(--safe-bot));animation:slideUp 0.22s ease}
+.img-ctx-header{display:flex;align-items:center;padding:12px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.img-ctx-preview{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.img-ctx-sender{flex:1;padding:0 12px}
+.img-ctx-sender-name{font-size:14px;font-weight:600;color:#fff}
+.img-ctx-sender-time{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px}
+.img-ctx-item{display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;transition:background 0.12s;color:#fff;font-size:15px}
+.img-ctx-item:hover{background:rgba(255,255,255,0.06)}
+.img-ctx-item.danger{color:#FF453A}
+.img-ctx-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.img-ctx-divider{height:1px;background:rgba(255,255,255,0.08);margin:4px 0}
+
+/* ── CONTACTS TAB ── */
+.contact-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);background:#fff;transition:background 0.15s;cursor:pointer}
+.contact-item:hover{background:#F5F5F5}
+.contact-av{width:48px;height:48px;border-radius:50%;background:#128C7E;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0}
+.contact-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.contact-info{flex:1;min-width:0}
+.contact-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.contact-detail{font-size:12px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.contact-action{flex-shrink:0}
+.contact-msg-btn{background:#128C7E;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer}
+.contact-invite-btn{background:transparent;color:#128C7E;border:1.5px solid #128C7E;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer}
+.contacts-header{padding:12px 14px;background:#F0F2F5;border-bottom:1px solid var(--border);flex-shrink:0}
+.contacts-header-btn{width:100%;padding:10px 14px;background:#128C7E;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.contacts-note{padding:10px 14px;font-size:11px;color:var(--text3);text-align:center;line-height:1.6}
 </style>
 </head>
 <body>
@@ -511,6 +562,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
       </div>
       <div class="fg"><label>Display Name</label><input type="text" id="su-name" placeholder="Your name"/></div>
       <div class="fg"><label>Email</label><input type="email" id="su-email" placeholder="you@email.com"/></div>
+      <div class="fg"><label>Phone Number (optional)</label><input type="tel" id="su-phone" placeholder="e.g. +2348012345678"/><p class="hint">Used to match with your contacts</p></div>
       <div class="fg"><label>Password</label>
         <div class="pw-wrap">
           <input type="password" id="su-pass" placeholder="Min 6 characters"/>
@@ -557,10 +609,12 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
         <div class="stab active" onclick="switchSideTab('chats',this)">Chats</div>
         <div class="stab" onclick="switchSideTab('groups',this)">Groups</div>
         <div class="stab" onclick="switchSideTab('requests',this)">Requests<span class="stab-badge" id="req-badge"></span></div>
+        <div class="stab" onclick="switchSideTab('contacts',this)">Contacts</div>
       </div>
       <div class="tab-pane active" id="pane-chats"></div>
       <div class="tab-pane" id="pane-groups"></div>
       <div class="tab-pane" id="pane-requests"></div>
+      <div class="tab-pane" id="pane-contacts"></div>
     </div>
 
     <div class="chat-area">
@@ -609,7 +663,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
         </div>
         <div class="chat-input-area">
           <div class="iw" id="normal-iw">
-            <textarea id="msg-txt" placeholder="Type a message..." rows="1" oninput="handleInput(this)" onkeydown="handleEnter(event)"></textarea>
+            <button onclick="toggleStickerPanel()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:0 4px;color:var(--text3);flex-shrink:0" title="Stickers">🎭</button><textarea id="msg-txt" placeholder="Type a message..." rows="1" oninput="handleInput(this)" onkeydown="handleEnter(event)"></textarea>
             <div class="iw-actions">
               <label style="cursor:pointer;font-size:17px;color:var(--text2)">
                 🖼️<input type="file" accept="image/*,video/*" style="display:none" onchange="sendMedia(this)"/>
@@ -807,6 +861,35 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 <div class="img-viewer" id="img-viewer">
   <button class="img-viewer-close" onclick="closeImgViewer()">✕</button>
   <img id="viewer-img" src="" alt=""/>
+</div>
+
+
+<!-- STICKER PANEL -->
+<div class="sticker-panel" id="sticker-panel">
+  <div class="sp-header" id="sp-header">
+    <div class="sp-tab active" onclick="switchStickerTab('recent',this)">🕐 Recent</div>
+    <div class="sp-tab" onclick="switchStickerTab('favs',this)">⭐ Favs</div>
+    <div class="sp-tab" onclick="switchStickerTab('mine',this)">✨ Mine</div>
+    <div class="sp-tab" onclick="switchStickerTab('pack1',this)">😀 Emoji Art</div>
+    <div class="sp-tab" onclick="switchStickerTab('pack2',this)">🐾 Animals</div>
+  </div>
+  <div class="sp-body" id="sp-body">
+    <div class="sticker-empty">Tap a sticker to send it instantly!</div>
+  </div>
+</div>
+
+<!-- IMAGE CONTEXT SHEET -->
+<div class="img-ctx-sheet" id="img-ctx-sheet" onclick="closeImgCtx(event)">
+  <div class="img-ctx-inner" id="img-ctx-inner">
+    <div class="img-ctx-header" id="img-ctx-header">
+      <img class="img-ctx-preview" id="img-ctx-preview" src="" alt=""/>
+      <div class="img-ctx-sender">
+        <div class="img-ctx-sender-name" id="img-ctx-sender-name"></div>
+        <div class="img-ctx-sender-time" id="img-ctx-sender-time"></div>
+      </div>
+    </div>
+    <div id="img-ctx-items"></div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1024,7 +1107,8 @@ window.doSignup=async function(){
       try{pfpUrl=await uploadCloud(pendingPfpFile,'pfps');await updateProfile(cred.user,{photoURL:pfpUrl});}catch(ue){}
     }
     btn.textContent='Saving profile...';
-    await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,name,email:email.toLowerCase(),username,pfp:pfpUrl,statusText:'Hey there! I am on 2k26_DSA',createdAt:serverTimestamp(),friends:[]});
+    const phone=document.getElementById('su-phone')?.value.trim()||'';
+    await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,name,email:email.toLowerCase(),username,pfp:pfpUrl,phone,statusText:'Hey there! I am on 2k26_DSA',createdAt:serverTimestamp(),friends:[]});
     toast('Welcome to 2k26_DSA! 🎉');
   }catch(e){
     if(cred?.user){try{await deleteUser(cred.user);}catch(de){}}
@@ -1291,12 +1375,7 @@ window.filterChats=function(val){
     if(nameEl)el.style.display=nameEl.textContent.toLowerCase().includes(val.toLowerCase())?'':'none';
   });
 };
-window.switchSideTab=function(tab,el){
-  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pane-'+tab).classList.add('active');
-};
+// switchSideTab overridden below
 
 // ── OPEN CHAT ──
 window.openChat=async function(cid,type){
@@ -1390,7 +1469,8 @@ function renderMsg(m,chatType){
   const attr=`oncontextmenu="showCtx(event,'${m.id}')" ondblclick="showCtx(event,'${m.id}')" id="msg_${m.id}"`;
   let content='';
   if(m.type==='text')content=`<div class="mb${m.edited?' edited':''}" ${attr}>${formatText(esc(m.text||''))}</div>`;
-  else if(m.type==='image')content=`<div class="mb" ${attr}><img class="m-img" src="${m.url}" onclick="openImgViewer('${m.url}')"/></div>`;
+  else if(m.type==='sticker')content=`<div class="mb m-sticker" ${attr}><img src="${m.url}" style="width:100px;height:100px;object-fit:contain;display:block"/></div>`;
+  else if(m.type==='image')content=`<div class="mb" ${attr}><img class="m-img" src="${m.url}" onclick="openImgViewer('${m.url}')" oncontextmenu="showImgCtx(event,'${m.url}','${esc(m.senderName||'')}','${fmtTime(m.timestamp)}')" onlongpress="showImgCtx(event,'${m.url}','${esc(m.senderName||'')}','${fmtTime(m.timestamp)}')" style="touch-action:none"/></div>`;
   else if(m.type==='audio')content=`<div class="mb m-audio" ${attr}><audio controls src="${m.url}" style="width:210px"></audio></div>`;
   const reactions=m.reactions||{};
   const rHtml=Object.entries(reactions).filter(([,v])=>v?.length).map(([e,u])=>
@@ -2284,6 +2364,381 @@ window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(e
 async function setOnline(){if(!CU)return;try{await setDoc(doc(db,'users',CU.uid),{lastSeen:serverTimestamp()},{merge:true});}catch(e){}}
 setInterval(setOnline,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setOnline();});
+
+
+// ══════════════════════════════════════════
+// ── STICKER SYSTEM ──
+// ══════════════════════════════════════════
+const STICKER_PACKS = {
+  pack1: {
+    name:'😀 Emoji Art',
+    stickers:[
+      'https://em-content.zobj.net/source/apple/391/grinning-face_1f600.png',
+      'https://em-content.zobj.net/source/apple/391/face-with-tears-of-joy_1f602.png',
+      'https://em-content.zobj.net/source/apple/391/smiling-face-with-heart-eyes_1f60d.png',
+      'https://em-content.zobj.net/source/apple/391/winking-face_1f609.png',
+      'https://em-content.zobj.net/source/apple/391/face-blowing-a-kiss_1f618.png',
+      'https://em-content.zobj.net/source/apple/391/smiling-face-with-sunglasses_1f60e.png',
+      'https://em-content.zobj.net/source/apple/391/loudly-crying-face_1f62d.png',
+      'https://em-content.zobj.net/source/apple/391/face-screaming-in-fear_1f631.png',
+      'https://em-content.zobj.net/source/apple/391/thinking-face_1f914.png',
+      'https://em-content.zobj.net/source/apple/391/zany-face_1f92a.png',
+      'https://em-content.zobj.net/source/apple/391/partying-face_1f973.png',
+      'https://em-content.zobj.net/source/apple/391/fire_1f525.png',
+      'https://em-content.zobj.net/source/apple/391/red-heart_2764-fe0f.png',
+      'https://em-content.zobj.net/source/apple/391/hundred-points_1f4af.png',
+      'https://em-content.zobj.net/source/apple/391/thumbs-up_1f44d.png',
+      'https://em-content.zobj.net/source/apple/391/clapping-hands_1f44f.png',
+    ]
+  },
+  pack2: {
+    name:'🐾 Animals',
+    stickers:[
+      'https://em-content.zobj.net/source/apple/391/dog-face_1f436.png',
+      'https://em-content.zobj.net/source/apple/391/cat-face_1f431.png',
+      'https://em-content.zobj.net/source/apple/391/bear_1f43b.png',
+      'https://em-content.zobj.net/source/apple/391/rabbit-face_1f430.png',
+      'https://em-content.zobj.net/source/apple/391/fox_1f98a.png',
+      'https://em-content.zobj.net/source/apple/391/panda_1f43c.png',
+      'https://em-content.zobj.net/source/apple/391/monkey-face_1f435.png',
+      'https://em-content.zobj.net/source/apple/391/penguin_1f427.png',
+      'https://em-content.zobj.net/source/apple/391/duck_1f986.png',
+      'https://em-content.zobj.net/source/apple/391/frog_1f438.png',
+      'https://em-content.zobj.net/source/apple/391/unicorn_1f984.png',
+      'https://em-content.zobj.net/source/apple/391/dragon-face_1f432.png',
+    ]
+  }
+};
+
+function getStickerFavs(){try{return JSON.parse(localStorage.getItem('sticker_favs')||'[]');}catch(e){return[];}}
+function getStickerRecent(){try{return JSON.parse(localStorage.getItem('sticker_recent')||'[]');}catch(e){return[];}}
+function getStickerMine(){try{return JSON.parse(localStorage.getItem('sticker_mine')||'[]');}catch(e){return[];}}
+function saveStickerFavs(arr){localStorage.setItem('sticker_favs',JSON.stringify(arr));}
+function saveStickerRecent(arr){localStorage.setItem('sticker_recent',JSON.stringify(arr.slice(0,20)));}
+function saveStickerMine(arr){localStorage.setItem('sticker_mine',JSON.stringify(arr));}
+
+let _activeStickerTab='recent';
+window.toggleStickerPanel=function(){
+  if(!activeChatId){toast('Open a chat first');return;}
+  const panel=document.getElementById('sticker-panel');
+  if(panel.classList.contains('show')){panel.classList.remove('show');return;}
+  panel.classList.add('show');
+  loadStickerTab(_activeStickerTab);
+};
+window.switchStickerTab=function(tab,el){
+  _activeStickerTab=tab;
+  document.querySelectorAll('.sp-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  loadStickerTab(tab);
+};
+function loadStickerTab(tab){
+  const body=document.getElementById('sp-body');
+  let stickers=[];
+  if(tab==='recent')stickers=getStickerRecent();
+  else if(tab==='favs')stickers=getStickerFavs();
+  else if(tab==='mine')stickers=getStickerMine();
+  else if(STICKER_PACKS[tab])stickers=STICKER_PACKS[tab].stickers;
+  if(!stickers.length){
+    const msgs={'recent':'No recent stickers yet. Send one!','favs':'No favourites yet. Long-press a sticker to add!','mine':'No custom stickers yet. Long-press an image in chat → Create Sticker!'};
+    body.innerHTML=`<div class="sticker-empty">${msgs[tab]||'No stickers'}</div>`;return;
+  }
+  const favs=getStickerFavs();
+  body.innerHTML=`<div class="sticker-grid">${stickers.map(url=>{
+    const isFav=favs.includes(url);
+    return`<div class="sticker-item" onclick="sendSticker('${url}')" oncontextmenu="stickerLongPress(event,'${url}')" ontouchstart="stickerTouchStart(event,'${url}')" ontouchend="stickerTouchEnd()">
+      <img src="${url}" loading="lazy" onerror="this.parentElement.style.display='none'"/>
+      <button class="sticker-fav-btn" onclick="event.stopPropagation();toggleStickerFav('${url}')">${isFav?'★':'☆'}</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+let _stickerLongTimer=null;
+window.stickerTouchStart=function(e,url){_stickerLongTimer=setTimeout(()=>stickerLongPress(e,url),600);};
+window.stickerTouchEnd=function(){clearTimeout(_stickerLongTimer);};
+window.stickerLongPress=function(e,url){
+  e.preventDefault();
+  const favs=getStickerFavs();
+  const isFav=favs.includes(url);
+  if(isFav){
+    const idx=favs.indexOf(url);favs.splice(idx,1);saveStickerFavs(favs);
+    toast('Removed from favourites');
+  }else{
+    favs.unshift(url);saveStickerFavs(favs);
+    toast('Added to favourites ⭐');
+  }
+  loadStickerTab(_activeStickerTab);
+};
+window.toggleStickerFav=function(url){
+  const favs=getStickerFavs();
+  const isFav=favs.includes(url);
+  if(isFav){favs.splice(favs.indexOf(url),1);}else{favs.unshift(url);}
+  saveStickerFavs(favs);
+  loadStickerTab(_activeStickerTab);
+  toast(isFav?'Removed from favourites':'Added to favourites ⭐');
+};
+window.sendSticker=async function(url){
+  if(!activeChatId)return;
+  document.getElementById('sticker-panel').classList.remove('show');
+  const recent=getStickerRecent();
+  const idx=recent.indexOf(url);if(idx>-1)recent.splice(idx,1);
+  recent.unshift(url);saveStickerRecent(recent);
+  try{
+    await addDoc(collection(db,'chats',activeChatId,'messages'),{
+      type:'sticker',url,senderId:CU.uid,
+      senderName:CUD?.name||CU.displayName||'User',
+      senderUsername:CUD?.username||'',
+      timestamp:serverTimestamp(),reactions:{},tags:[],deleted:false
+    });
+    await updateChatMeta('🎭 Sticker');
+  }catch(e){toast('❌ '+e.message);}
+};
+// Close sticker panel on outside click
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('sticker-panel');
+  if(panel&&panel.classList.contains('show')&&!e.target.closest('#sticker-panel')&&!e.target.closest('button[title="Stickers"]')){
+    panel.classList.remove('show');
+  }
+});
+
+// ══════════════════════════════════════════
+// ── IMAGE CONTEXT SHEET ──
+// ══════════════════════════════════════════
+let _imgCtxUrl='',_imgCtxMsgId='';
+// Override openImgViewer to use long press instead
+document.addEventListener('touchstart',e=>{
+  const img=e.target.closest('.m-img');
+  if(!img)return;
+  const mw=img.closest('.mw');
+  const msgId=mw?.dataset?.msgid||'';
+  const url=img.src;
+  _imgLongTimer=setTimeout(()=>{
+    // prevent swipe from triggering
+    swipeTouchStart=null;swipeMsgEl=null;
+    showImgCtx(null,url,mw?.querySelector('.m-sender')?.textContent||'',msgId);
+  },500);
+},{passive:true});
+let _imgLongTimer=null;
+document.addEventListener('touchend',()=>clearTimeout(_imgLongTimer),{passive:true});
+document.addEventListener('touchmove',()=>clearTimeout(_imgLongTimer),{passive:true});
+
+window.showImgCtx=function(e,url,senderName,msgId){
+  if(e)e.preventDefault();
+  _imgCtxUrl=url;_imgCtxMsgId=msgId||ctxMsgId||'';
+  const preview=document.getElementById('img-ctx-preview');
+  preview.src=url;
+  document.getElementById('img-ctx-sender-name').textContent=senderName||'Image';
+  document.getElementById('img-ctx-sender-time').textContent='Tap an option below';
+  const isOwn=_msgCache[_imgCtxMsgId]?.senderId===CU.uid;
+  const isAdmin=activeChatType==='group'&&activeChatData?.admins?.includes(CU.uid);
+  document.getElementById('img-ctx-items').innerHTML=`
+    <div class="img-ctx-item" onclick="imgCtxAction('view')"><div class="img-ctx-icon">🖼️</div>View in gallery</div>
+    <div class="img-ctx-item" onclick="imgCtxAction('save')"><div class="img-ctx-icon">💾</div>Save</div>
+    <div class="img-ctx-item" onclick="imgCtxAction('sticker')"><div class="img-ctx-icon">🎭</div>Create sticker</div>
+    <div class="img-ctx-item" onclick="imgCtxAction('share')"><div class="img-ctx-icon">↗️</div>Share</div>
+    <div class="img-ctx-item" onclick="imgCtxAction('search')"><div class="img-ctx-icon">🔍</div>Search on web</div>
+    <div class="img-ctx-item" onclick="imgCtxAction('chat')"><div class="img-ctx-icon">💬</div>Show in chat</div>
+    <div class="img-ctx-divider"></div>
+    ${isOwn?`<div class="img-ctx-item danger" onclick="imgCtxAction('delete')"><div class="img-ctx-icon">🗑️</div>Delete</div>`:''}
+    ${isAdmin&&!isOwn?`<div class="img-ctx-item danger" onclick="imgCtxAction('admindelete')"><div class="img-ctx-icon">🗑️</div>Admin Delete</div>`:''}
+    <div class="img-ctx-item" onclick="closeImgCtxSheet()"><div class="img-ctx-icon">✕</div>Cancel</div>
+  `;
+  document.getElementById('img-ctx-sheet').classList.add('show');
+};
+window.closeImgCtx=function(e){
+  if(e&&e.target.id==='img-ctx-sheet')closeImgCtxSheet();
+};
+window.closeImgCtxSheet=function(){
+  document.getElementById('img-ctx-sheet').classList.remove('show');
+};
+window.imgCtxAction=async function(action){
+  closeImgCtxSheet();
+  const url=_imgCtxUrl;
+  if(action==='view'){openImgViewer(url);}
+  else if(action==='save'){
+    const a=document.createElement('a');a.href=url;a.download='2k26_image_'+Date.now()+'.jpg';a.target='_blank';a.click();
+    toast('Saving image...');
+  }
+  else if(action==='sticker'){
+    const mine=getStickerMine();
+    if(mine.includes(url)){toast('Already in your stickers!');return;}
+    mine.unshift(url);saveStickerMine(mine);
+    toast('Sticker created! 🎭 Find it in the Sticker panel → ✨ Mine');
+  }
+  else if(action==='share'){
+    if(navigator.share){navigator.share({url}).catch(()=>{});}
+    else{navigator.clipboard?.writeText(url);toast('Link copied!');}
+  }
+  else if(action==='search'){
+    window.open('https://www.google.com/searchbyimage?image_url='+encodeURIComponent(url),'_blank');
+  }
+  else if(action==='chat'){
+    const el=document.getElementById('msg_'+_imgCtxMsgId);
+    if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.outline='2px solid #128C7E';setTimeout(()=>el.style.outline='',1200);}
+  }
+  else if(action==='delete'){
+    ctxMsgId=_imgCtxMsgId;deleteMsg();
+  }
+  else if(action==='admindelete'){
+    ctxMsgId=_imgCtxMsgId;adminDeleteMsg();
+  }
+};
+
+// ══════════════════════════════════════════
+// ── CONTACTS (Phone Contact Picker API) ──
+// ══════════════════════════════════════════
+window.switchSideTab=function(tab,el){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+tab).classList.add('active');
+  if(tab==='contacts')renderContactsTab();
+};
+
+function renderContactsTab(){
+  const pane=document.getElementById('pane-contacts');
+  const supported='contacts' in navigator && 'ContactsManager' in window;
+  pane.innerHTML=`
+    <div class="contacts-header">
+      <button class="contacts-header-btn" onclick="loadPhoneContacts()">
+        📱 ${supported?'Browse Phone Contacts':'Find Friends'}
+      </button>
+    </div>
+    <div id="contacts-list">
+      <div class="contacts-note">
+        ${supported
+          ?'Tap above to find which of your contacts are on 2k26_DSA. Works on Android Chrome.'
+          :'Your browser doesn't support the Contact Picker yet.
+Use <strong>Find User</strong> to search by username instead.'}
+      </div>
+    </div>`;
+}
+
+window.loadPhoneContacts=async function(){
+  const list=document.getElementById('contacts-list');
+  const supported='contacts' in navigator && 'ContactsManager' in window;
+  if(!supported){
+    list.innerHTML=`<div class="contacts-note">Contact Picker is only supported on Android Chrome.<br/><br/><button class="contacts-header-btn" onclick="openFindUser()" style="margin-top:8px">🔍 Search by Username</button></div>`;
+    return;
+  }
+  list.innerHTML='<div class="contacts-note">Requesting contacts access...</div>';
+  try{
+    const contacts=await navigator.contacts.select(['name','tel'],{multiple:true});
+    if(!contacts.length){list.innerHTML='<div class="contacts-note">No contacts selected.</div>';return;}
+    list.innerHTML='<div class="contacts-note">Matching with 2k26_DSA users...</div>';
+    // Normalize phone numbers and search Firestore
+    const results=[];
+    const phoneSet=new Set();
+    contacts.forEach(c=>{
+      (c.tel||[]).forEach(t=>{
+        const normalized=t.replace(/\s+/g,'').replace(/^0/,'+234'); // basic NG normalization
+        phoneSet.add(normalized);
+        results.push({name:(c.name||[])[0]||'Unknown',phone:normalized});
+      });
+    });
+    // Query Firestore for matching phone numbers (in batches of 10)
+    const phones=[...phoneSet];
+    const matched=[];
+    const notMatched=[];
+    // Firestore `in` queries max 10 at a time
+    for(let i=0;i<phones.length;i+=10){
+      const batch=phones.slice(i,i+10);
+      try{
+        const snap=await getDocs(query(collection(db,'users'),where('phone','in',batch)));
+        snap.docs.forEach(d=>{
+          const u=d.data();
+          const contactEntry=results.find(r=>r.phone===u.phone);
+          matched.push({...u,contactName:contactEntry?.name||u.name});
+        });
+      }catch(e){}
+    }
+    // Contacts not on app
+    const matchedPhones=new Set(matched.map(u=>u.phone));
+    results.forEach(r=>{if(!matchedPhones.has(r.phone))notMatched.push(r);});
+    renderContacts(matched,notMatched);
+  }catch(e){
+    if(e.name==='SecurityError'||e.name==='NotAllowedError'){
+      list.innerHTML='<div class="contacts-note">❌ Contact access denied.<br/>Allow access in your browser settings.</div>';
+    }else{
+      list.innerHTML=`<div class="contacts-note">❌ ${e.message}</div>`;
+    }
+  }
+};
+
+function renderContacts(matched,notMatched){
+  const list=document.getElementById('contacts-list');
+  if(!matched.length&&!notMatched.length){
+    list.innerHTML='<div class="contacts-note">No contacts found.</div>';return;
+  }
+  let html='';
+  if(matched.length){
+    html+=`<div style="padding:8px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;background:var(--bg3)">${matched.length} on 2k26_DSA</div>`;
+    html+=matched.map(u=>`
+      <div class="contact-item" onclick="openDMWithUid('${u.uid}','${esc(u.name)}','${u.pfp||''}','${esc(u.username||'')}')">
+        <div class="contact-av">${u.pfp?`<img src="${u.pfp}"/>`:(u.name||'?')[0].toUpperCase()}</div>
+        <div class="contact-info">
+          <div class="contact-name">${esc(u.contactName||u.name)}</div>
+          <div class="contact-detail">@${esc(u.username||'')} · On 2k26_DSA ✅</div>
+        </div>
+        <div class="contact-action"><button class="contact-msg-btn" onclick="event.stopPropagation();openDMWithUid('${u.uid}','${esc(u.name)}','${u.pfp||''}','${esc(u.username||'')}')">💬 Chat</button></div>
+      </div>`).join('');
+  }
+  if(notMatched.length){
+    html+=`<div style="padding:8px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;background:var(--bg3);margin-top:4px">${notMatched.length} not on 2k26_DSA</div>`;
+    html+=notMatched.slice(0,20).map(c=>`
+      <div class="contact-item">
+        <div class="contact-av" style="background:#8696A0">${(c.name||'?')[0].toUpperCase()}</div>
+        <div class="contact-info">
+          <div class="contact-name">${esc(c.name)}</div>
+          <div class="contact-detail">${esc(c.phone)}</div>
+        </div>
+        <div class="contact-action"><button class="contact-invite-btn" onclick="inviteContact('${esc(c.phone)}')">Invite</button></div>
+      </div>`).join('');
+  }
+  document.getElementById('contacts-list').innerHTML=html;
+}
+
+window.inviteContact=function(phone){
+  const msg=`Hey! I use 2k26_DSA to chat - join me! Download it here: ${window.location.href}`;
+  if(navigator.share){navigator.share({text:msg}).catch(()=>window.open(`sms:${phone}?body=${encodeURIComponent(msg)}`));}
+  else{window.open(`sms:${phone}?body=${encodeURIComponent(msg)}`);}
+};
+
+// ══════════════════════════════════════════
+// ── PWA SERVICE WORKER ──
+// ══════════════════════════════════════════
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    const sw=`
+      self.addEventListener('fetch',e=>{
+        e.respondWith(
+          caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{
+            if(e.request.url.includes('firebasejs')||e.request.url.includes('googleapis'))return res;
+            const clone=res.clone();
+            caches.open('2k26-v1').then(c=>c.put(e.request,clone));
+            return res;
+          }))
+        );
+      });
+    `;
+    const blob=new Blob([sw],{type:'application/javascript'});
+    const url=URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).then(()=>{}).catch(()=>{});
+  });
+}
+// Prompt install on mobile
+let _installPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();_installPrompt=e;
+  // Show install toast after 5s
+  setTimeout(()=>{
+    if(_installPrompt){
+      toast('📱 Tap to install as app',5000,()=>{
+        _installPrompt.prompt();
+        _installPrompt.userChoice.then(()=>{_installPrompt=null;});
+      });
+    }
+  },5000);
+});
+
 </script>
 </body>
 </html>
