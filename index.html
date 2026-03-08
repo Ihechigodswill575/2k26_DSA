@@ -72,7 +72,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 /* Logo: clean circle with animated border */
 .boot-logo-outer{
   position:relative;
-  width:116px;height:116px;
+  width:80px;height:80px;
   display:flex;align-items:center;justify-content:center;
   animation:logoReveal 0.9s cubic-bezier(0.22,1,0.36,1) 0.3s both
 }
@@ -82,29 +82,33 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 }
 /* Rotating arc segment — not full ring */
 .boot-arc{
-  position:absolute;inset:-6px;
+  position:absolute;inset:-8px;
   border-radius:50%;
-  border:2.5px solid transparent;
+  border:3px solid transparent;
   border-top-color:#25D366;
-  border-right-color:rgba(37,211,102,0.3);
-  animation:arcSpin 1.8s linear infinite
+  border-right-color:rgba(37,211,102,0.25);
+  animation:arcSpin 1.4s linear infinite
 }
 @keyframes arcSpin{to{transform:rotate(360deg)}}
 .boot-arc2{
-  position:absolute;inset:-6px;
+  position:absolute;inset:-18px;
   border-radius:50%;
-  border:2.5px solid transparent;
-  border-bottom-color:rgba(37,211,102,0.15);
-  animation:arcSpin 1.8s linear infinite reverse;
-  animation-delay:-0.9s
+  border:1.5px solid transparent;
+  border-bottom-color:rgba(37,211,102,0.2);
+  border-left-color:rgba(37,211,102,0.08);
+  animation:arcSpin 2.2s linear infinite reverse
 }
-.boot-logo-img{
-  width:100px;height:100px;
+/* Green glowing center dot */
+.boot-logo-outer::after{
+  content:'';
+  position:absolute;
+  width:20px;height:20px;
   border-radius:50%;
-  object-fit:cover;
-  border:2px solid rgba(255,255,255,0.08);
-  background:#1A1A1A
+  background:radial-gradient(circle,#25D366,rgba(37,211,102,0.3));
+  box-shadow:0 0 20px rgba(37,211,102,0.6),0 0 40px rgba(37,211,102,0.2);
+  animation:dotPulse 1.8s ease-in-out infinite
 }
+@keyframes dotPulse{0%,100%{transform:scale(0.9);opacity:0.8}50%{transform:scale(1.1);opacity:1}}
 
 /* App name — letter by letter fade up */
 .boot-name{
@@ -700,10 +704,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
     <div class="boot-logo-outer">
       <div class="boot-arc"></div>
       <div class="boot-arc2"></div>
-      <img class="boot-logo-img"
-        src="https://image2url.com/r2/default/images/1772295169769-b92423f9-499f-4178-942f-409c094d9380.jpg"
-        onerror="this.style.background='#1A2A1A'"
-        alt=""/>
     </div>
     <div class="boot-name">2k26_DSA</div>
     <div class="boot-tag">Connect · Chat · Vibe</div>
@@ -3298,19 +3298,7 @@ window.handleSendOrMic=function(){
   if(txt){sendMessage();}
   else{toggleVN();}
 };
-// Override handleInput to also update send/mic
-const _savedHandleInput=window.handleInput;
-window.handleInput=function(el){
-  if(_savedHandleInput)_savedHandleInput(el);
-  updateSendMicBtn();
-};
-// Initialize on chat open
-const _savedOpenChat=window.openChat;
-window.openChat=async function(cid,type){
-  if(_savedOpenChat)await _savedOpenChat(cid,type);
-  updateSendMicBtn();
-};
-// Init on load
+// Init send/mic btn on load
 setTimeout(updateSendMicBtn, 500);
 
 // ── READ RECEIPTS: conditionally mark read ──
