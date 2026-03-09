@@ -1127,103 +1127,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 </div>
 
 
-<!-- SETTINGS PAGE -->
-<div class="settings-page" id="settings-page">
-  <div class="settings-header">
-    <button class="settings-back" onclick="closeSettings()">←</button>
-    <h2>Settings</h2>
-    <button style="background:none;border:none;color:#E9EDEF;font-size:20px;cursor:pointer">🔍</button>
-  </div>
-  <div class="settings-body" id="settings-body">
-    <!-- Profile card filled by JS -->
-    <div id="settings-profile-card" class="settings-profile-card" onclick="openProfileEdit()">
-      <div class="settings-profile-av" id="settings-av">?</div>
-      <div>
-        <div class="settings-profile-name" id="settings-name">Loading...</div>
-        <div class="settings-profile-status" id="settings-status">Hey there!</div>
-      </div>
-    </div>
 
-    <div class="settings-section">
-      <div class="settings-section-label">Account</div>
-      <div class="settings-item" onclick="toast('Privacy settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🔒</div>
-        <div class="settings-item-info"><div class="settings-item-label">Privacy</div><div class="settings-item-sub">Block contacts, disappearing messages</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('Security settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🔑</div>
-        <div class="settings-item-info"><div class="settings-item-label">Account</div><div class="settings-item-sub">Security notifications, change number</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Chats</div>
-      <div class="settings-item">
-        <div class="settings-icon" style="background:#2A3942">✓✓</div>
-        <div class="settings-item-info"><div class="settings-item-label">Read receipts</div><div class="settings-item-sub">Show when you've read messages</div></div>
-        <button class="settings-toggle on" id="read-receipt-toggle" onclick="toggleReadReceipts(this)"></button>
-      </div>
-      <div class="settings-item" onclick="toast('Wallpaper settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🖼️</div>
-        <div class="settings-item-info"><div class="settings-item-label">Chats</div><div class="settings-item-sub">Theme, wallpapers, chat history</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Notifications</div>
-      <div class="settings-item" onclick="toast('Notification settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🔔</div>
-        <div class="settings-item-info"><div class="settings-item-label">Notifications</div><div class="settings-item-sub">Message, group &amp; call tones</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Data</div>
-      <div class="settings-item" onclick="toast('Storage settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">💾</div>
-        <div class="settings-item-info"><div class="settings-item-label">Storage and data</div><div class="settings-item-sub">Network usage, auto-download</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">More</div>
-      <div class="settings-item" onclick="toast('Accessibility settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">♿</div>
-        <div class="settings-item-info"><div class="settings-item-label">Accessibility</div><div class="settings-item-sub">Increase contrast, animation</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('App language: English')">
-        <div class="settings-icon" style="background:#2A3942">🌐</div>
-        <div class="settings-item-info"><div class="settings-item-label">App language</div><div class="settings-item-sub">English (device language)</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('2k26_DSA v1.0 by DEVGODSWILL')">
-        <div class="settings-icon" style="background:#2A3942">ℹ️</div>
-        <div class="settings-item-info"><div class="settings-item-label">Help and feedback</div><div class="settings-item-sub">Help centre, contact us, privacy policy</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="shareInvite()">
-        <div class="settings-icon" style="background:#2A3942">👥</div>
-        <div class="settings-item-info"><div class="settings-item-label">Invite a friend</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('2k26_DSA v1.0 — Latest')">
-        <div class="settings-icon" style="background:#2A3942">📱</div>
-        <div class="settings-item-info"><div class="settings-item-label">App updates</div><div class="settings-item-sub">v1.0 — Up to date</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div style="text-align:center;padding:24px 16px 40px">
-      <button onclick="doLogout()" style="background:none;border:none;color:#EF4444;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">🚪 Log out</button>
-    </div>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1538,32 +1442,35 @@ document.addEventListener('click',e=>{
 
 // ── PROFILE ──
 window.openProfileEdit=function(){
-  
-  const sec=document.getElementById('profile-view-section');
-  sec.innerHTML=`
-    <div style="text-align:center;margin-bottom:18px">
-      ${CUD?.pfp?`<img src="${CUD.pfp}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2.5px solid var(--accent)"/>`
-      :`<div style="width:80px;height:80px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto">${(CUD?.name||'U')[0]}</div>`}
-    </div>
-    <div class="info-row">
-      <div class="info-chip"><div class="ic-label">Display Name</div><div class="ic-val">${esc(CUD?.name||'')}</div></div>
-      <div class="info-chip"><div class="ic-label">Username</div><div class="ic-val">@${esc(CUD?.username||'')}</div></div>
-    </div>
-    <div class="info-row">
-      <div class="info-chip"><div class="ic-label">Email</div><div class="ic-val">${esc(CUD?.email||CU?.email||'')}</div></div>
-    </div>
-    <div class="info-row">
-      <div class="info-chip"><div class="ic-label">Status Text</div><div class="ic-val">${esc(CUD?.statusText||'')}</div></div>
-    </div>
-    <div class="info-row">
-      <div class="info-chip"><div class="ic-label">Friends</div><div class="ic-val">${(CUD?.friends||[]).length} friends</div></div>
-      <div class="info-chip"><div class="ic-label">Member Since</div><div class="ic-val">${CUD?.createdAt?fmtTime(CUD.createdAt):'—'}</div></div>
-    </div>`;
-  if(CUD?.pfp)document.getElementById('edit-pfp-preview').innerHTML=`<img src="${CUD.pfp}"/>`;
-  document.getElementById('edit-name').value=CUD?.name||'';
-  document.getElementById('edit-status-text').value=CUD?.statusText||'';
-  document.getElementById('profile-overlay').classList.add('show');
+  const overlay=document.getElementById('profile-overlay');
+  if(!overlay)return;
+  const prev=document.getElementById('edit-pfp-preview');
+  if(prev){
+    if(CUD&&CUD.pfp)prev.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+    else prev.textContent=(CUD&&CUD.name||'U')[0].toUpperCase();
+  }
+  const dn=document.getElementById('profile-display-name');
+  const du=document.getElementById('profile-display-user');
+  if(dn)dn.textContent=CUD&&CUD.name||'';
+  if(du)du.textContent='@'+(CUD&&CUD.username||'');
+  const en=document.getElementById('edit-name');
+  const es=document.getElementById('edit-status-text');
+  if(en)en.value=CUD&&CUD.name||'';
+  if(es)es.value=CUD&&CUD.statusText||'';
+  const stats=document.getElementById('profile-stats');
+  if(stats){
+    const friends=(CUD&&CUD.friends||[]).length;
+    const since=CUD&&CUD.createdAt&&CUD.createdAt.toDate?new Date(CUD.createdAt.toDate()).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'--';
+    stats.innerHTML='<div style="flex:1;min-width:120px;background:#1F2C34;border-radius:10px;padding:12px 16px"><div style="font-size:11px;color:#8696A0;text-transform:uppercase;letter-spacing:0.5px">Friends</div><div style="font-size:22px;font-weight:800;color:#E9EDEF;margin-top:4px">'+friends+'</div></div><div style="flex:1;min-width:120px;background:#1F2C34;border-radius:10px;padding:12px 16px"><div style="font-size:11px;color:#8696A0;text-transform:uppercase;letter-spacing:0.5px">Member Since</div><div style="font-size:22px;font-weight:800;color:#E9EDEF;margin-top:4px">'+since+'</div></div>';
+  }
+  const info=document.getElementById('profile-view-section');
+  if(info){
+    info.innerHTML='<div style="background:#1F2C34;border-radius:10px;padding:14px 16px;margin-top:6px"><div style="font-size:11px;color:#25D366;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px">Email</div><div style="color:#E9EDEF;font-size:14px">'+(CUD&&CUD.email||CU&&CU.email||'--')+'</div></div>';
+  }
+  pendingEditPfpFile=null;
+  overlay.classList.add('show');
 };
+
 window.saveProfile=async function(){
   hideErr('edit-err');
   const name=document.getElementById('edit-name').value.trim();
@@ -3141,28 +3048,20 @@ window.inviteContact=function(phone){
 window.openSettings=function(){
   const page=document.getElementById('settings-overlay');
   if(!page)return;
-  // Fill profile card
-  const av=document.getElementById('settings-av');
+  const pfp=document.getElementById('settings-pfp');
   const nm=document.getElementById('settings-name');
-  const st=document.getElementById('settings-status');
-  if(av){
-    if(CUD?.pfp)av.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
-    else av.textContent=(CUD?.name||'?')[0].toUpperCase();
+  const un=document.getElementById('settings-username');
+  const st=document.getElementById('settings-status-text');
+  if(pfp){
+    if(CUD&&CUD.pfp)pfp.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+    else pfp.innerHTML='<span style="font-size:28px;font-weight:700;color:#fff">'+(CUD&&CUD.name||'?')[0].toUpperCase()+'</span>';
   }
-  if(nm)nm.textContent=CUD?.name||CU?.displayName||'User';
-  if(st)st.textContent=CUD?.statusText||'Hey there!';
-  // Read receipt toggle state
-  const tog=document.getElementById('read-receipt-toggle');
-  if(tog){
-    const on=localStorage.getItem('readReceipts')!=='off';
-    tog.classList.toggle('on',on);
-  }
+  if(nm)nm.textContent=CUD&&CUD.name||'User';
+  if(un)un.textContent='@'+(CUD&&CUD.username||'');
+  if(st)st.textContent=CUD&&CUD.statusText||'Hey there!';
   page.classList.add('show');
-  ['settings-pfp','settings-av'].forEach(function(id){var e=document.getElementById(id);if(!e)return;if(CUD&&CUD.pfp)e.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';else e.innerHTML='<span>'+(CUD&&CUD.name||'?')[0].toUpperCase()+'</span>';});
-  var sn=document.getElementById('settings-name');if(sn)sn.textContent=CUD&&CUD.name||'User';
-  var su=document.getElementById('settings-username');if(su)su.textContent='@'+(CUD&&CUD.username||'');
-  var ss=document.getElementById('settings-status-text');if(ss)ss.textContent=CUD&&CUD.statusText||'Hey there!';
 };
+
 window.closeSettings=function(){
   document.getElementById('settings-overlay')?.classList.remove('show');
 };
@@ -3287,68 +3186,75 @@ window.doForgotPassword=async function(){
 </script>
 
 <!-- SETTINGS SUB-PAGES -->
-<div class="settings-sub" id="settings-sub-privacy">
-  <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('privacy')">‹</button><h2>Privacy</h2></div>
-  <div class="settings-body" style="padding:0">
-    <div class="settings-section">
-      <div class="settings-item">
-        <div class="settings-icon teal">✅</div>
-        <div class="settings-item-info"><div class="settings-item-title">Read Receipts</div><div class="settings-item-desc">Show blue ticks when you read messages</div></div>
-        <button class="settings-toggle on" id="read-receipt-toggle" onclick="toggleReadReceipts(this)"></button>
-      </div>
-      <div class="settings-item">
-        <div class="settings-icon green">🟢</div>
-        <div class="settings-item-info"><div class="settings-item-title">Last Seen &amp; Online</div><div class="settings-item-desc">Show when you were last active</div></div>
-        <button class="settings-toggle on" id="online-status-toggle" onclick="toggleOnlineStatus(this)"></button>
-      </div>
-    </div>
-  </div>
-</div>
+
+<!-- ACCOUNT SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-account">
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('account')">‹</button><h2>Account</h2></div>
   <div class="settings-body" style="padding:0">
     <div class="settings-section">
-      <div class="settings-item" onclick="toast('Change password coming soon')"><div class="settings-icon teal">🔑</div><div class="settings-item-info"><div class="settings-item-title">Change Password</div></div><div class="settings-item-right">›</div></div>
-      <div class="settings-item" onclick="toast('Two-step verification coming soon')"><div class="settings-icon green">🛡️</div><div class="settings-item-info"><div class="settings-item-title">Two-step verification</div></div><div class="settings-item-right">›</div></div>
-      <div class="settings-item" onclick="if(confirm('Delete account permanently?'))doLogout()"><div class="settings-icon" style="background:#3d1515">🗑️</div><div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Delete Account</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="doForgotPassword();closeSettingsSub('account');toast('Reset email sent to your inbox',3000)"><div class="settings-icon teal">🔑</div><div class="settings-item-info"><div class="settings-item-title">Change Password</div><div class="settings-item-desc">Send reset email to your address</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="toast('Two-step verification coming soon')"><div class="settings-icon green">🛡️</div><div class="settings-item-info"><div class="settings-item-title">Two-step verification</div><div class="settings-item-desc">Add extra security to your account</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="if(confirm('Permanently delete your account? This cannot be undone.'))doLogout()"><div class="settings-icon" style="background:#3d1515">🗑️</div><div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Delete Account</div><div class="settings-item-desc">Permanently delete your account</div></div><div class="settings-item-right">›</div></div>
     </div>
   </div>
 </div>
-<div class="settings-sub" id="settings-sub-chats">
-  <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('chats')">‹</button><h2>Chats</h2></div>
-  <div class="settings-body" style="padding:0">
-    <div class="settings-section">
-      <div class="settings-item" onclick="toast('Wallpaper coming soon')"><div class="settings-icon teal">🖼️</div><div class="settings-item-info"><div class="settings-item-title">Chat Wallpaper</div></div><div class="settings-item-right">›</div></div>
-      <div class="settings-item" onclick="if(confirm('Clear all chats? Cannot be undone.'))toast('Coming soon')"><div class="settings-icon" style="background:#3d1515">🧹</div><div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Clear All Chats</div></div><div class="settings-item-right">›</div></div>
-    </div>
-  </div>
-</div>
+
+<!-- NOTIFICATIONS SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-notifications">
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('notifications')">‹</button><h2>Notifications</h2></div>
   <div class="settings-body" style="padding:0">
     <div class="settings-section">
-      <div class="settings-item"><div class="settings-icon teal">💬</div><div class="settings-item-info"><div class="settings-item-title">Message Notifications</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
-      <div class="settings-item"><div class="settings-icon orange">🔔</div><div class="settings-item-info"><div class="settings-item-title">Notification Sound</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
-      <div class="settings-item"><div class="settings-icon green">📳</div><div class="settings-item-info"><div class="settings-item-title">Vibration</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="settings-section-title">Messages</div>
+      <div class="settings-item"><div class="settings-icon teal">💬</div><div class="settings-item-info"><div class="settings-item-title">Message Notifications</div><div class="settings-item-desc">Show notifications for new messages</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'Notifications on':'Notifications off')"></button></div>
+      <div class="settings-item"><div class="settings-icon orange">🔔</div><div class="settings-item-info"><div class="settings-item-title">Notification Sound</div><div class="settings-item-desc">Play sound for new messages</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="settings-item"><div class="settings-icon green">📳</div><div class="settings-item-info"><div class="settings-item-title">Vibration</div><div class="settings-item-desc">Vibrate for new messages</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">Groups</div>
+      <div class="settings-item"><div class="settings-icon teal">👥</div><div class="settings-item-info"><div class="settings-item-title">Group Notifications</div><div class="settings-item-desc">Show notifications for group messages</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
     </div>
   </div>
 </div>
+
+<!-- STORAGE SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-storage">
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('storage')">‹</button><h2>Storage and Data</h2></div>
   <div class="settings-body" style="padding:0">
     <div class="settings-section">
-      <div class="settings-item" onclick="toast('Storage manager coming soon')"><div class="settings-icon blue">📦</div><div class="settings-item-info"><div class="settings-item-title">Manage Storage</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="toast('Storage manager coming soon')"><div class="settings-icon blue">📦</div><div class="settings-item-info"><div class="settings-item-title">Manage Storage</div><div class="settings-item-desc">Free up space on your device</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item"><div class="settings-icon teal">📶</div><div class="settings-item-info"><div class="settings-item-title">Use Less Data</div><div class="settings-item-desc">Reduce data usage on mobile</div></div><button class="settings-toggle" onclick="this.classList.toggle('on')"></button></div>
+      <div class="settings-item"><div class="settings-icon green">⬇️</div><div class="settings-item-info"><div class="settings-item-title">Auto-download Media</div><div class="settings-item-desc">Download media automatically on Wi-Fi</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
     </div>
   </div>
 </div>
+
+<!-- CHATS SUB-PAGE -->
+<div class="settings-sub" id="settings-sub-chats">
+  <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('chats')">‹</button><h2>Chats</h2></div>
+  <div class="settings-body" style="padding:0">
+    <div class="settings-section">
+      <div class="settings-item" onclick="toast('Wallpaper coming soon')"><div class="settings-icon teal">🖼️</div><div class="settings-item-info"><div class="settings-item-title">Chat Wallpaper</div><div class="settings-item-desc">Change your chat background</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item"><div class="settings-icon green">📩</div><div class="settings-item-info"><div class="settings-item-title">Media Visibility</div><div class="settings-item-desc">Show media in phone gallery</div></div><button class="settings-toggle on" onclick="this.classList.toggle('on')"></button></div>
+      <div class="settings-item" onclick="if(confirm('Archive all chats?'))toast('Coming soon')"><div class="settings-icon orange">📁</div><div class="settings-item-info"><div class="settings-item-title">Archive All Chats</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="if(confirm('Clear all message history? Cannot be undone.'))toast('Coming soon')"><div class="settings-icon" style="background:#3d1515">🧹</div><div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Clear All Chats</div><div class="settings-item-desc">Delete all message history</div></div><div class="settings-item-right">›</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HELP SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-help">
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('help')">‹</button><h2>Help</h2></div>
   <div class="settings-body" style="padding:0">
     <div class="settings-section">
-      <div class="settings-item" onclick="toast('FAQ coming soon')"><div class="settings-icon blue">❓</div><div class="settings-item-info"><div class="settings-item-title">FAQ</div></div><div class="settings-item-right">›</div></div>
-      <div class="settings-item" onclick="toast('Contact support coming soon')"><div class="settings-icon teal">📧</div><div class="settings-item-info"><div class="settings-item-title">Contact Us</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="toast('FAQ coming soon')"><div class="settings-icon blue">❓</div><div class="settings-item-info"><div class="settings-item-title">FAQ</div><div class="settings-item-desc">Frequently asked questions</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="toast('Contact support: devgodswill@2k26dsa.app')"><div class="settings-icon teal">📧</div><div class="settings-item-info"><div class="settings-item-title">Contact Us</div><div class="settings-item-desc">Get help from the team</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="toast('Terms coming soon')"><div class="settings-icon grey">📄</div><div class="settings-item-info"><div class="settings-item-title">Terms and Privacy Policy</div></div><div class="settings-item-right">›</div></div>
     </div>
-    <div style="padding:20px;text-align:center;color:#8696A0;font-size:12px">2K26_DSA v1.0 · by DevGodswill</div>
+    <div style="padding:24px;text-align:center;color:#8696A0;font-size:12px;line-height:1.8">
+      <div style="font-size:15px;font-weight:700;color:#E9EDEF;margin-bottom:4px">2K26_DSA</div>
+      <div>Version 1.0.0</div>
+      <div style="margin-top:4px">Created by <span style="color:#25D366">DevGodswill</span></div>
+    </div>
   </div>
 </div>
 
