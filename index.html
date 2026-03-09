@@ -10,7 +10,7 @@
 <title>2k26_DSA</title>
 <link rel="manifest" href="data:application/json,{%22name%22:%222k26_DSA%22,%22short_name%22:%222k26%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23075E54%22,%22theme_color%22:%22%23128C7E%22,%22icons%22:[{%22src%22:%22https://image2url.com/r2/default/images/1772295169769-b92423f9-499f-4178-942f-409c094d9380.jpg%22,%22sizes%22:%22192x192%22,%22type%22:%22image/jpeg%22}]}"/>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --bg:#ECE5DD;--bg2:#FFFFFF;--bg3:#F0F2F5;--bg4:#E9EDEF;
@@ -27,23 +27,24 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 
 /* ═══════════════ ADVANCED BOOT ANIMATION ═══════════════ */
 /* ═══ SPLASH SCREEN ═══ */
-#splash{position:fixed;inset:0;z-index:9999;background:#080a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity 0.6s ease}
-#splash.hide{opacity:0;pointer-events:none}
-.sp-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(79,142,247,0.15) 0%,transparent 70%);animation:spGlow 3s ease-in-out infinite;pointer-events:none}
-@keyframes spGlow{0%,100%{transform:scale(0.9);opacity:0.6}50%{transform:scale(1.1);opacity:1}}
-.sp-icon{position:relative;z-index:2;animation:spIconIn 0.8s cubic-bezier(0.34,1.4,0.64,1) 0.3s both}
-@keyframes spIconIn{from{opacity:0;transform:scale(0.3)}to{opacity:1;transform:scale(1)}}
-.sp-icon svg{filter:drop-shadow(0 0 12px #4f8ef7) drop-shadow(0 0 30px rgba(79,142,247,0.4));animation:spIconGlow 2s ease-in-out 1.2s infinite}
-@keyframes spIconGlow{0%,100%{filter:drop-shadow(0 0 8px #4f8ef7) drop-shadow(0 0 20px rgba(79,142,247,0.3))}50%{filter:drop-shadow(0 0 20px #4f8ef7) drop-shadow(0 0 40px rgba(79,142,247,0.6))}}
-.sp-name{position:relative;z-index:2;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:8px;color:#e8ecf4;text-transform:uppercase;margin-top:20px;text-shadow:0 0 40px rgba(79,142,247,0.3);animation:spNameIn 0.7s cubic-bezier(0.34,1.2,0.64,1) 1s both}
-@keyframes spNameIn{from{opacity:0;letter-spacing:20px;transform:translateY(10px)}to{opacity:1;letter-spacing:8px;transform:translateY(0)}}
-.sp-tagline{position:relative;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10px;color:#3d4559;letter-spacing:1.5px;margin-top:8px;animation:spFade 0.6s ease 1.7s both}
-@keyframes spFade{from{opacity:0}to{opacity:1}}
-.sp-dots{position:relative;z-index:2;display:flex;gap:8px;margin-top:50px;animation:spFade 0.5s ease 2.1s both}
-.sp-dot{width:6px;height:6px;border-radius:50%;background:#4f8ef7;animation:spDot 1.2s ease-in-out infinite}
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+#splash{position:fixed;inset:0;z-index:9999;background:#080a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity 0.7s ease}
+#splash.sp-hide{opacity:0;pointer-events:none}
+.sp-glow{position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(79,142,247,0.16) 0%,rgba(79,142,247,0.05) 45%,transparent 70%);animation:spGlow 3s ease-in-out infinite;pointer-events:none}
+@keyframes spGlow{0%,100%{transform:scale(0.88);opacity:0.6}50%{transform:scale(1.1);opacity:1}}
+.sp-icon{position:relative;z-index:2;animation:spIconIn 1s cubic-bezier(0.34,1.4,0.64,1) 0.2s both}
+@keyframes spIconIn{from{opacity:0;transform:scale(0.2)}to{opacity:1;transform:scale(1)}}
+.sp-icon svg{filter:drop-shadow(0 0 14px rgba(79,142,247,0.9)) drop-shadow(0 0 32px rgba(79,142,247,0.35));animation:spIconGlow 2.5s ease-in-out 1.2s infinite}
+@keyframes spIconGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(79,142,247,0.7))}50%{filter:drop-shadow(0 0 22px #4f8ef7) drop-shadow(0 0 44px rgba(79,142,247,0.5))}}
+.sp-name{position:relative;z-index:2;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:8px;color:#e8ecf4;text-transform:uppercase;margin-top:22px;text-shadow:0 0 40px rgba(79,142,247,0.3);animation:spNameIn 0.8s cubic-bezier(0.34,1.2,0.64,1) 0.9s both}
+@keyframes spNameIn{from{opacity:0;letter-spacing:22px;transform:translateY(12px)}to{opacity:1;letter-spacing:8px;transform:translateY(0)}}
+.sp-tagline{position:relative;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10px;color:#3d4559;letter-spacing:1.5px;margin-top:9px;animation:spFadeIn 0.6s ease 1.65s both}
+@keyframes spFadeIn{from{opacity:0}to{opacity:1}}
+.sp-dots{position:relative;z-index:2;display:flex;gap:9px;margin-top:54px;animation:spFadeIn 0.5s ease 2.1s both}
+.sp-dot{width:6px;height:6px;border-radius:50%;background:#4f8ef7;animation:spDotBounce 1.2s ease-in-out infinite}
 .sp-dot:nth-child(2){animation-delay:0.2s}.sp-dot:nth-child(3){animation-delay:0.4s}
-@keyframes spDot{0%,100%{opacity:0.2;transform:scale(0.7)}50%{opacity:1;transform:scale(1.3)}}
-.sp-credit{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom,0px));z-index:2;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#4f8ef7;animation:spFade 0.6s ease 2.5s both}
+@keyframes spDotBounce{0%,100%{opacity:0.2;transform:scale(0.65)}50%{opacity:1;transform:scale(1.35)}}
+.sp-credit{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom,0px));z-index:2;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3.5px;text-transform:uppercase;color:#4f8ef7;opacity:0;animation:spFadeIn 0.6s ease 2.5s both}
 
 /* ═══ GLOBAL KEYFRAMES ═══ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -439,6 +440,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 /* ── SETTINGS OVERLAY ── */
 .settings-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:300;flex-direction:column}
 .settings-overlay.show{display:flex}
+.settings-sub{display:none;position:fixed;inset:0;background:#111B21;z-index:260;flex-direction:column;padding-top:var(--safe-top)}
+.settings-sub.show{display:flex}
+
 .settings-header{display:flex;align-items:center;gap:14px;padding:14px 16px;padding-top:calc(14px + var(--safe-top));background:#128C7E;color:#fff;flex-shrink:0}
 .settings-header h2{font-size:18px;font-weight:700;flex:1}
 .settings-back{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;width:36px;height:36px}
@@ -567,14 +571,14 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 <div id="splash">
   <div class="sp-glow"></div>
   <div class="sp-icon">
-    <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-      <path d="M8 32C8 18.7 18.7 8 32 8" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
-      <path d="M56 32C56 18.7 45.3 8 32 8" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
-      <path d="M15 32C15 22.6 22.6 15 32 15" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
-      <path d="M49 32C49 22.6 41.4 15 32 15" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
-      <path d="M22 32C22 26.5 26.5 22 32 22" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M42 32C42 26.5 37.5 22 32 22" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="32" cy="32" r="4" fill="#4f8ef7"/>
+    <svg width="66" height="66" viewBox="0 0 66 66" fill="none">
+      <path d="M6 33C6 17.5 17.5 6 33 6" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.28"/>
+      <path d="M60 33C60 17.5 48.5 6 33 6" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.28"/>
+      <path d="M13 33C13 21.4 21.4 13 33 13" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.52"/>
+      <path d="M53 33C53 21.4 44.6 13 33 13" stroke="#4f8ef7" stroke-width="2.5" stroke-linecap="round" opacity="0.52"/>
+      <path d="M21 33C21 26.4 26.4 21 33 21" stroke="#4f8ef7" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M45 33C45 26.4 39.6 21 33 21" stroke="#4f8ef7" stroke-width="2.8" stroke-linecap="round"/>
+      <circle cx="33" cy="33" r="4.5" fill="#4f8ef7"/>
     </svg>
   </div>
   <div class="sp-name">2K26_DSA</div>
@@ -1081,6 +1085,165 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
       </div>
     </div>
   </div>
+
+<!-- ACCOUNT SUB-PAGE -->
+<div class="settings-sub" id="settings-sub-account">
+  <div class="settings-header">
+    <button class="settings-back" onclick="closeSettingsSub('account')">‹</button>
+    <h2>Account</h2>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <div class="settings-section-title">Security</div>
+      <div class="settings-item" onclick="toast('Change password coming soon')">
+        <div class="settings-icon teal">🔑</div>
+        <div class="settings-item-info"><div class="settings-item-title">Change Password</div><div class="settings-item-desc">Update your account password</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+      <div class="settings-item" onclick="toast('Two-factor auth coming soon')">
+        <div class="settings-icon green">🛡️</div>
+        <div class="settings-item-info"><div class="settings-item-title">Two-step verification</div><div class="settings-item-desc">Add extra security to your account</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">Account</div>
+      <div class="settings-item" onclick="toast('Delete account coming soon')">
+        <div class="settings-icon" style="background:#3d1515">🗑️</div>
+        <div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Delete Account</div><div class="settings-item-desc">Permanently delete your account</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHATS SUB-PAGE -->
+<div class="settings-sub" id="settings-sub-chats">
+  <div class="settings-header">
+    <button class="settings-back" onclick="closeSettingsSub('chats')">‹</button>
+    <h2>Chats</h2>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <div class="settings-section-title">Appearance</div>
+      <div class="settings-item" onclick="toast('Wallpaper coming soon')">
+        <div class="settings-icon teal">🖼️</div>
+        <div class="settings-item-info"><div class="settings-item-title">Chat Wallpaper</div><div class="settings-item-desc">Change chat background</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+      <div class="settings-item">
+        <div class="settings-icon blue">🌙</div>
+        <div class="settings-item-info"><div class="settings-item-title">Dark Mode</div><div class="settings-item-desc">Always on</div></div>
+        <button class="settings-toggle on"></button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">History</div>
+      <div class="settings-item" onclick="toast('Export coming soon')">
+        <div class="settings-icon orange">📤</div>
+        <div class="settings-item-info"><div class="settings-item-title">Export Chat</div><div class="settings-item-desc">Export chat history</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+      <div class="settings-item" onclick="if(confirm('Clear all messages? This cannot be undone.'))toast('Coming soon')">
+        <div class="settings-icon" style="background:#3d1515">🧹</div>
+        <div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Clear All Chats</div><div class="settings-item-desc">Delete all message history</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS SUB-PAGE -->
+<div class="settings-sub" id="settings-sub-notifications">
+  <div class="settings-header">
+    <button class="settings-back" onclick="closeSettingsSub('notifications')">‹</button>
+    <h2>Notifications</h2>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <div class="settings-section-title">Messages</div>
+      <div class="settings-item">
+        <div class="settings-icon teal">💬</div>
+        <div class="settings-item-info"><div class="settings-item-title">Message Notifications</div><div class="settings-item-desc">Show notifications for new messages</div></div>
+        <button class="settings-toggle on" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'Message notifications on':'Message notifications off')"></button>
+      </div>
+      <div class="settings-item">
+        <div class="settings-icon blue">👥</div>
+        <div class="settings-item-info"><div class="settings-item-title">Group Notifications</div><div class="settings-item-desc">Show notifications for groups</div></div>
+        <button class="settings-toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="settings-item">
+        <div class="settings-icon orange">🔔</div>
+        <div class="settings-item-info"><div class="settings-item-title">Notification Sound</div><div class="settings-item-desc">Play sound for messages</div></div>
+        <button class="settings-toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="settings-item">
+        <div class="settings-icon green">📳</div>
+        <div class="settings-item-info"><div class="settings-item-title">Vibration</div><div class="settings-item-desc">Vibrate on new messages</div></div>
+        <button class="settings-toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STORAGE SUB-PAGE -->
+<div class="settings-sub" id="settings-sub-storage">
+  <div class="settings-header">
+    <button class="settings-back" onclick="closeSettingsSub('storage')">‹</button>
+    <h2>Storage and Data</h2>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <div class="settings-section-title">Storage</div>
+      <div class="settings-item" onclick="toast('Storage manager coming soon')">
+        <div class="settings-icon blue">📦</div>
+        <div class="settings-item-info"><div class="settings-item-title">Manage Storage</div><div class="settings-item-desc">See what's using space</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">Auto-Download</div>
+      <div class="settings-item">
+        <div class="settings-icon teal">📶</div>
+        <div class="settings-item-info"><div class="settings-item-title">Photos</div><div class="settings-item-desc">Auto-download on Wi-Fi</div></div>
+        <button class="settings-toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="settings-item">
+        <div class="settings-icon orange">🎥</div>
+        <div class="settings-item-info"><div class="settings-item-title">Videos</div><div class="settings-item-desc">Auto-download on Wi-Fi only</div></div>
+        <button class="settings-toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HELP SUB-PAGE -->
+<div class="settings-sub" id="settings-sub-help">
+  <div class="settings-header">
+    <button class="settings-back" onclick="closeSettingsSub('help')">‹</button>
+    <h2>Help</h2>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <div class="settings-item" onclick="toast('FAQ coming soon')">
+        <div class="settings-icon blue">❓</div>
+        <div class="settings-item-info"><div class="settings-item-title">FAQ</div><div class="settings-item-desc">Frequently asked questions</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+      <div class="settings-item" onclick="toast('Contact support coming soon')">
+        <div class="settings-icon teal">📧</div>
+        <div class="settings-item-info"><div class="settings-item-title">Contact Us</div><div class="settings-item-desc">Report a problem</div></div>
+        <div class="settings-item-right">›</div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div style="padding:16px;text-align:center">
+        <div style="font-size:13px;color:#8696A0">2K26_DSA v1.0</div>
+        <div style="font-size:11px;color:#3d4559;margin-top:4px">Created by DevGodswill</div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- STICKER PANEL -->
@@ -1112,103 +1275,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 </div>
 
 
-<!-- SETTINGS PAGE -->
-<div class="settings-page" id="settings-page">
-  <div class="settings-header">
-    <button class="settings-back" onclick="closeSettings()">←</button>
-    <h2>Settings</h2>
-    <button style="background:none;border:none;color:#E9EDEF;font-size:20px;cursor:pointer">🔍</button>
-  </div>
-  <div class="settings-body" id="settings-body">
-    <!-- Profile card filled by JS -->
-    <div id="settings-profile-card" class="settings-profile-card" onclick="openProfileEdit()">
-      <div class="settings-profile-av" id="settings-av">?</div>
-      <div>
-        <div class="settings-profile-name" id="settings-name">Loading...</div>
-        <div class="settings-profile-status" id="settings-status">Hey there!</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Account</div>
-      <div class="settings-item" onclick="toast('Privacy settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🔒</div>
-        <div class="settings-item-info"><div class="settings-item-label">Privacy</div><div class="settings-item-sub">Block contacts, disappearing messages</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('Security settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🔑</div>
-        <div class="settings-item-info"><div class="settings-item-label">Account</div><div class="settings-item-sub">Security notifications, change number</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Chats</div>
-      <div class="settings-item">
-        <div class="settings-icon" style="background:#2A3942">✓✓</div>
-        <div class="settings-item-info"><div class="settings-item-label">Read receipts</div><div class="settings-item-sub">Show when you've read messages</div></div>
-        <button class="settings-toggle on" id="read-receipt-toggle" onclick="toggleReadReceipts(this)"></button>
-      </div>
-      <div class="settings-item" onclick="toast('Wallpaper settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🖼️</div>
-        <div class="settings-item-info"><div class="settings-item-label">Chats</div><div class="settings-item-sub">Theme, wallpapers, chat history</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Notifications</div>
-      <div class="settings-item" onclick="toast('Notification settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">🔔</div>
-        <div class="settings-item-info"><div class="settings-item-label">Notifications</div><div class="settings-item-sub">Message, group &amp; call tones</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Data</div>
-      <div class="settings-item" onclick="toast('Storage settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">💾</div>
-        <div class="settings-item-info"><div class="settings-item-label">Storage and data</div><div class="settings-item-sub">Network usage, auto-download</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">More</div>
-      <div class="settings-item" onclick="toast('Accessibility settings coming soon')">
-        <div class="settings-icon" style="background:#2A3942">♿</div>
-        <div class="settings-item-info"><div class="settings-item-label">Accessibility</div><div class="settings-item-sub">Increase contrast, animation</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('App language: English')">
-        <div class="settings-icon" style="background:#2A3942">🌐</div>
-        <div class="settings-item-info"><div class="settings-item-label">App language</div><div class="settings-item-sub">English (device language)</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('2k26_DSA v1.0 by DEVGODSWILL')">
-        <div class="settings-icon" style="background:#2A3942">ℹ️</div>
-        <div class="settings-item-info"><div class="settings-item-label">Help and feedback</div><div class="settings-item-sub">Help centre, contact us, privacy policy</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="shareInvite()">
-        <div class="settings-icon" style="background:#2A3942">👥</div>
-        <div class="settings-item-info"><div class="settings-item-label">Invite a friend</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-      <div class="settings-item" onclick="toast('2k26_DSA v1.0 — Latest')">
-        <div class="settings-icon" style="background:#2A3942">📱</div>
-        <div class="settings-item-info"><div class="settings-item-label">App updates</div><div class="settings-item-sub">v1.0 — Up to date</div></div>
-        <div class="settings-item-right">›</div>
-      </div>
-    </div>
-
-    <div style="text-align:center;padding:24px 16px 40px">
-      <button onclick="doLogout()" style="background:none;border:none;color:#EF4444;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">🚪 Log out</button>
-    </div>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1481,7 +1547,7 @@ window.openProfileEdit=function(){
       <div class="info-chip"><div class="ic-label">Friends</div><div class="ic-val">${(CUD?.friends||[]).length} friends</div></div>
       <div class="info-chip"><div class="ic-label">Member Since</div><div class="ic-val">${CUD?.createdAt?fmtTime(CUD.createdAt):'—'}</div></div>
     </div>`;
-  if(CUD?.pfp)document.getElementById('edit-pfp-preview').innerHTML=`<img src="${CUD.pfp}"/>`;
+  const pfpEl=document.getElementById('edit-pfp-preview');if(pfpEl){if(CUD?.pfp)pfpEl.innerHTML=`<img src="${CUD.pfp}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;else pfpEl.textContent=(CUD?.name||'U')[0].toUpperCase();}
   document.getElementById('edit-name').value=CUD?.name||'';
   document.getElementById('edit-status-text').value=CUD?.statusText||'';
   document.getElementById('profile-overlay').classList.add('show');
@@ -3112,28 +3178,51 @@ window.inviteContact=function(phone){
 // ── SETTINGS PAGE ──
 // ══════════════════════════════════════════
 window.openSettings=function(){
-  const page=document.getElementById('settings-page');
-  if(!page)return;
-  // Fill profile card
-  const av=document.getElementById('settings-av');
-  const nm=document.getElementById('settings-name');
-  const st=document.getElementById('settings-status');
-  if(av){
-    if(CUD?.pfp)av.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
-    else av.textContent=(CUD?.name||'?')[0].toUpperCase();
-  }
-  if(nm)nm.textContent=CUD?.name||CU?.displayName||'User';
-  if(st)st.textContent=CUD?.statusText||'Hey there!';
-  // Read receipt toggle state
+  const page=document.getElementById('settings-overlay');
+  if(!page){console.error('settings-overlay not found');return;}
+  // Fill pfp - try all possible IDs
+  ['settings-pfp','settings-av'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    if(CUD?.pfp)el.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+    else el.innerHTML='<span style="font-size:22px;font-weight:700">'+(CUD?.name||'?')[0].toUpperCase()+'</span>';
+  });
+  // Fill text fields
+  const setTxt=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setTxt('settings-name', CUD?.name||CU?.displayName||'User');
+  setTxt('settings-username', '@'+(CUD?.username||''));
+  setTxt('settings-status', CUD?.statusText||'Hey there!');
+  setTxt('settings-status-text', CUD?.statusText||'Hey there!');
+  // Read receipt toggle
   const tog=document.getElementById('read-receipt-toggle');
-  if(tog){
-    const on=localStorage.getItem('readReceipts')!=='off';
-    tog.classList.toggle('on',on);
-  }
+  if(tog){const on=localStorage.getItem('readReceipts')!=='off';tog.classList.toggle('on',on);}
+  // Online status toggle
+  const otog=document.getElementById('online-status-toggle');
+  if(otog){const on=localStorage.getItem('onlineStatus')!=='off';otog.classList.toggle('on',on);}
   page.classList.add('show');
 };
+
+// ── MISSING FUNCTIONS ──
+window.openSettingsSub=function(name){
+  const el=document.getElementById('settings-sub-'+name);
+  if(el)el.classList.add('show');else toast('Coming soon');
+};
+window.closeSettingsSub=function(name){
+  const el=document.getElementById('settings-sub-'+name);
+  if(el)el.classList.remove('show');
+};
+window.toggleOnlineStatus=function(btn){
+  const on=btn.classList.contains('on');
+  btn.classList.toggle('on',!on);
+  localStorage.setItem('onlineStatus',!on?'on':'off');
+  toast(!on?'Online status visible':'Online status hidden');
+};
+window.openModal=function(id){
+  const el=document.getElementById(id);if(el)el.classList.add('show');
+};
+
 window.closeSettings=function(){
-  document.getElementById('settings-page')?.classList.remove('show');
+  document.getElementById('settings-overlay')?.classList.remove('show');
 };
 window.toggleReadReceipts=function(btn){
   const isOn=btn.classList.contains('on');
@@ -3166,7 +3255,19 @@ window.handleSendOrMic=function(){
   if(txt){sendMessage();}
   else{toggleVN();}
 };
-// Init send/mic btn on load
+// Override handleInput to also update send/mic
+const _savedHandleInput=window.handleInput;
+window.handleInput=function(el){
+  if(_savedHandleInput)_savedHandleInput(el);
+  updateSendMicBtn();
+};
+// Initialize on chat open
+const _savedOpenChat=window.openChat;
+window.openChat=async function(cid,type){
+  if(_savedOpenChat)await _savedOpenChat(cid,type);
+  updateSendMicBtn();
+};
+// Init on load
 setTimeout(updateSendMicBtn, 500);
 
 // ── READ RECEIPTS: conditionally mark read ──
@@ -3210,6 +3311,28 @@ window.addEventListener('beforeinstallprompt',e=>{
 });
 
 
+
+
+// ── SEND/MIC BUTTON ──
+function updateSendMicBtn(){
+  const txt=document.getElementById('msg-txt')?.value?.trim();
+  const si=document.getElementById('send-icon');
+  const mi=document.getElementById('mic-icon');
+  if(si&&mi){si.style.display=txt?'block':'none';mi.style.display=txt?'none':'block';}
+}
+window.handleSendOrMic=function(){
+  const txt=document.getElementById('msg-txt')?.value?.trim();
+  if(txt)sendMessage();else toggleVN();
+};
+setTimeout(updateSendMicBtn,500);
+
+// ── ONLINE PRESENCE ──
+async function setOnline(){
+  if(!CU)return;
+  try{await setDoc(doc(db,'users',CU.uid),{lastSeen:serverTimestamp()},{merge:true});}catch(e){}
+}
+setInterval(setOnline,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setOnline();});
 
 </script>
 </body>
