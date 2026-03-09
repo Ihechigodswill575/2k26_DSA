@@ -55,7 +55,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* AUTH */
-#auth{display:none;position:fixed;inset:0;background:#FFFFFF;z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding-top:var(--safe-top)}
+#auth{display:none;position:fixed;inset:0;background:#111B21;z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding-top:var(--safe-top)}
 #auth.show{display:flex}
 .auth-card{width:100%;max-width:420px;animation:slideUp 0.45s cubic-bezier(0.34,1.2,0.64,1);margin:auto}
 .auth-logo{text-align:center;background:#075E54;padding:40px 28px 32px;margin-bottom:0}
@@ -1375,7 +1375,8 @@ window.toggleEye=function(inputId,btn){
   else{inp.type='password';btn.textContent='👁';}
 };
 
-// splash dismissed by inline script below
+// checkAuth called by module on load
+if(document.readyState!=="loading"){window.checkAuth();}else{document.addEventListener("DOMContentLoaded",window.checkAuth);}
 
 window.checkAuth = function checkAuth(){
   try{
@@ -1387,11 +1388,17 @@ window.checkAuth = function checkAuth(){
             CUD={name:CU.displayName||'User',pfp:'',username:'',statusText:'',email:CU.email||''};
           }
           try{updateHeaderPfp();}catch(e){}
+          // Dismiss splash THEN show main (no white flash)
+          if(window._dismissSplash) window._dismissSplash();
           showMain();
-        }else{showAuth();}
-      }catch(e){console.error('checkAuth inner:',e);showAuth();}
-    },()=>showAuth());
-  }catch(e){console.error('checkAuth:',e);showAuth();}
+        }else{
+          // Dismiss splash THEN show auth
+          if(window._dismissSplash) window._dismissSplash();
+          showAuth();
+        }
+      }catch(e){console.error('checkAuth inner:',e);if(window._dismissSplash)window._dismissSplash();showAuth();}
+    },()=>{if(window._dismissSplash)window._dismissSplash();showAuth();});
+  }catch(e){console.error('checkAuth:',e);if(window._dismissSplash)window._dismissSplash();showAuth();}
 }
 async function loadCUD(uid){
   const s=await getDoc(doc(db,'users',uid));
@@ -3337,46 +3344,37 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)setOnline(
 </script>
 
 <script>
-// SPLASH DISMISS - runs immediately, no Firebase dependency
-(function() {
-  var SPLASH_TIME = 1800; // 1.8 seconds - fast!
-  var dismissed = false;
-  function dismiss() {
-    if (dismissed) return;
-    dismissed = true;
-    var sp = document.getElementById('splash');
-    if (sp) {
-      sp.style.transition = 'opacity 0.5s ease';
+// SPLASH CONTROLLER - independent of module
+(function(){
+  var sp = document.getElementById('splash');
+  var MIN_TIME = 1500; // show splash at least 1.5s
+  var start = Date.now();
+  
+  // Hide splash and hand off to app
+  window._dismissSplash = function() {
+    if (!sp) { return; }
+    var elapsed = Date.now() - start;
+    var wait = Math.max(0, MIN_TIME - elapsed);
+    setTimeout(function(){
+      sp.style.transition = 'opacity 0.4s ease';
       sp.style.opacity = '0';
-      setTimeout(function() {
+      setTimeout(function(){
         sp.style.display = 'none';
-        // Call checkAuth if module loaded, else poll until it's ready
-        if (typeof checkAuth === 'function') {
-          checkAuth();
-        } else {
-          var attempts = 0;
-          var poll = setInterval(function() {
-            attempts++;
-            if (typeof checkAuth === 'function') {
-              clearInterval(poll);
-              checkAuth();
-            } else if (attempts > 30) {
-              // Firebase took too long - show auth page directly
-              clearInterval(poll);
-              var auth = document.getElementById('auth');
-              if (auth) auth.style.display = 'flex';
-            }
-          }, 200);
-        }
-      }, 500);
+      }, 400);
+    }, wait);
+  };
+  
+  // Hard fallback: if module never calls dismissSplash after 5s, force it
+  setTimeout(function(){
+    if (sp && sp.style.display !== 'none') {
+      sp.style.display = 'none';
+      // Also show auth as last resort
+      var auth = document.getElementById('auth');
+      if (auth && !document.getElementById('main').classList.contains('show')) {
+        auth.classList.add('show');
+      }
     }
-  }
-  // Dismiss after 1.8s regardless of everything
-  setTimeout(dismiss, SPLASH_TIME);
-  // Also dismiss immediately when page fully loads (whichever is faster)
-  window.addEventListener('load', function() {
-    setTimeout(dismiss, 800);
-  });
+  }, 5000);
 })();
 </script>
 
