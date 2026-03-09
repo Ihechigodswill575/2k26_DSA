@@ -52,14 +52,14 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* AUTH */
-#auth{display:none;position:fixed;inset:0;background:#FFFFFF;z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding-top:var(--safe-top)}
-#auth.show{display:flex}
-.auth-card{width:100%;max-width:420px;animation:slideUp 0.45s cubic-bezier(0.34,1.2,0.64,1);margin:auto}
+#auth{display:none;position:fixed;inset:0;background:#075E54;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#auth.show{display:block}
+.auth-card{width:100%;max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;animation:slideUp 0.4s ease}
 .auth-logo{text-align:center;background:#075E54;padding:40px 28px 32px;margin-bottom:0}
 .auth-logo img{width:72px;height:72px;border-radius:50%;border:2.5px solid rgba(255,255,255,0.5);margin-bottom:12px;object-fit:cover}
 .auth-logo h2{font-size:22px;font-weight:700;color:#fff;letter-spacing:1px}
 .auth-logo p{color:rgba(255,255,255,0.55);font-size:12px;margin-top:4px}
-.auth-body-wrap{background:#fff;padding:24px 24px calc(24px + var(--safe-bot))}.auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:22px}
+.auth-body-wrap{background:#fff;flex:1;padding:24px 24px calc(40px + var(--safe-bot))}.auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:22px}
 .auth-tab{flex:1;padding:14px 10px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all 0.2s;border-bottom:2.5px solid transparent;margin-bottom:-2px}
 .auth-tab.active{color:#128C7E;border-bottom-color:#128C7E;background:transparent}
 .fg{margin-bottom:15px;position:relative}
@@ -1336,12 +1336,6 @@ async function uploadCloud(file,folder='2k26dsa'){
 }
 
 // ── EYE TOGGLE ──
-window.toggleEye=function(inputId,btn){
-  const inp=document.getElementById(inputId);
-  if(!inp)return;
-  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
-  else{inp.type='password';btn.textContent='👁';}
-};
 
 // ── SPLASH stays until Firebase answers ──
 var _spStart=Date.now();
@@ -1367,85 +1361,10 @@ checkAuth();
 
 
 
-window.switchTab=function(t){
-  document.getElementById('login-form').style.display=t==='login'?'block':'none';
-  document.getElementById('signup-form').style.display=t==='signup'?'block':'none';
-  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(t==='login'&&i===0)||(t==='signup'&&i===1)));
-};
-window.previewPfp=function(i){pendingPfpFile=i.files[0];if(pendingPfpFile)document.getElementById('pfp-preview').innerHTML=`<img src="${URL.createObjectURL(pendingPfpFile)}"/>`;};
-window.previewGcIcon=function(i){pendingGcIconFile=i.files[0];if(pendingGcIconFile)document.getElementById('gc-icon-preview').innerHTML=`<img src="${URL.createObjectURL(pendingGcIconFile)}"/>`;};
-window.previewEditPfp=function(i){
-  pendingEditPfpFile=i.files[0];
-  if(pendingEditPfpFile){
-    const url=URL.createObjectURL(pendingEditPfpFile);
-    const el=document.getElementById('edit-pfp-preview');
-    if(el)el.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
-  }
-};
-window.previewStatus=function(i){
-  pendingStatusFile=i.files[0];
-  if(!pendingStatusFile)return;
-  const url=URL.createObjectURL(pendingStatusFile);
-  document.getElementById('status-preview').innerHTML=pendingStatusFile.type.startsWith('video')
-    ?`<video src="${url}" style="max-width:100%;border-radius:10px;max-height:160px" controls playsinline></video>`
-    :`<img src="${url}" style="max-width:100%;border-radius:10px;max-height:160px"/>`;
-};
 
 // ── LOGIN ──
-window.doLogin=async function(){
-  const email=document.getElementById('login-email').value.trim();
-  const pass=document.getElementById('login-pass').value;
-  hideErr('login-err');
-  if(!email||!pass){showErr('login-err','Fill all fields.');return;}
-  const btn=document.getElementById('login-btn');
-  btn.disabled=true;btn.textContent='Logging in...';
-  try{
-    await signInWithEmailAndPassword(auth,email,pass);
-  }catch(e){
-    const m={'auth/user-not-found':'No account with this email.','auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/network-request-failed':'No internet.','auth/invalid-email':'Invalid email.','auth/too-many-requests':'Too many attempts. Try later.'};
-    showErr('login-err',m[e.code]||e.message);
-  }finally{btn.disabled=false;btn.textContent='Login';}
-};
 
 // ── SIGNUP ──
-window.doSignup=async function(){
-  const username=document.getElementById('su-username').value.trim();
-  const name=document.getElementById('su-name').value.trim();
-  const email=document.getElementById('su-email').value.trim();
-  const pass=document.getElementById('su-pass').value;
-  hideErr('su-err');
-  if(!username||username.length<3){showErr('su-err','Username must be 3+ characters.');return;}
-  if(!name||!email||!pass){showErr('su-err','Fill all fields.');return;}
-  if(pass.length<6){showErr('su-err','Password min 6 characters.');return;}
-  const btn=document.getElementById('su-btn');
-  btn.disabled=true;btn.textContent='Creating account...';
-  let cred=null;
-  try{
-    cred=await createUserWithEmailAndPassword(auth,email,pass);
-    await updateProfile(cred.user,{displayName:name});
-    btn.textContent='Checking username...';
-    const usnap=await getDocs(query(collection(db,'users'),where('username','==',username)));
-    if(!usnap.empty){
-      await deleteUser(cred.user);
-      showErr('su-err','Username taken. Try another.');
-      btn.disabled=false;btn.textContent='Create Account';return;
-    }
-    let pfpUrl='';
-    if(pendingPfpFile){
-      btn.textContent='Uploading photo...';
-      try{pfpUrl=await uploadCloud(pendingPfpFile,'pfps');await updateProfile(cred.user,{photoURL:pfpUrl});}catch(ue){}
-    }
-    btn.textContent='Saving profile...';
-    const phone=document.getElementById('su-phone')?.value.trim()||'';
-    await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,name,email:email.toLowerCase(),username,pfp:pfpUrl,phone,statusText:'Hey there! I am on 2k26_DSA',createdAt:serverTimestamp(),friends:[]});
-    toast('Welcome to 2k26_DSA! 🎉');
-  }catch(e){
-    if(cred?.user){try{await deleteUser(cred.user);}catch(de){}}
-    const m={'auth/email-already-in-use':'Email already registered.','auth/weak-password':'Password too weak.','auth/invalid-email':'Invalid email.','auth/network-request-failed':'No internet.'};
-    showErr('su-err',m[e.code]||e.message);
-    btn.disabled=false;btn.textContent='Create Account';
-  }
-};
 
 window.toggleEye=function(inputId,btn){
   const inp=document.getElementById(inputId);
@@ -1454,32 +1373,29 @@ window.toggleEye=function(inputId,btn){
   else{inp.type='password';btn.textContent='👁';}
 };
 
-// ── SPLASH with animated steps ──
-const spSteps=['Initializing...','Loading Firebase...','Connecting...','Almost ready...'];
-let spStepIdx=0;
-const spStepEl=document.getElementById('sp-step');// may be null in new boot design
-const spStepTimer=setInterval(()=>{
-  spStepIdx=(spStepIdx+1)%spSteps.length;
-  if(spStepEl)spStepEl.textContent=spSteps[spStepIdx]||'';
-},700);
-setTimeout(()=>{
-  clearInterval(spStepTimer);
-  if(spStepEl)spStepEl.textContent='Welcome!';
-  document.getElementById('splash').classList.add('hide');
-  setTimeout(()=>{document.getElementById('splash').style.display='none';checkAuth();},700);
-},3200);
+// splash handled by hideSplash + checkAuth below
 
 function checkAuth(){
+  clearTimeout(_spFallback);
+  if(window._splashGuardian)clearTimeout(window._splashGuardian);
   onAuthStateChanged(auth,async u=>{
+    clearTimeout(_spFallback);
+    if(window._splashGuardian)clearTimeout(window._splashGuardian);
     if(u){
       CU=u;
       try{await loadCUD(u.uid);}catch(e){
         CUD={name:CU.displayName||'User',pfp:'',username:'',statusText:'',email:CU.email||''};
-        updateHeaderPfp();
       }
-      showMain();
-    }else{showAuth();}
-  },()=>showAuth());
+      try{updateHeaderPfp();}catch(e){}
+      hideSplash(function(){showMain();});
+    }else{
+      hideSplash(function(){showAuth();});
+    }
+  },function(){
+    clearTimeout(_spFallback);
+    if(window._splashGuardian)clearTimeout(window._splashGuardian);
+    hideSplash(function(){showAuth();});
+  });
 }
 async function loadCUD(uid){
   const s=await getDoc(doc(db,'users',uid));
@@ -1541,11 +1457,18 @@ window.doLogin=async function(){
   const btn=document.getElementById('login-btn');
   btn.disabled=true;btn.textContent='Logging in...';
   try{
-    await signInWithEmailAndPassword(auth,email,pass);
+    const cred=await signInWithEmailAndPassword(auth,email,pass);
+    CU=cred.user;
+    try{await loadCUD(CU.uid);}catch(e){
+      CUD={name:CU.displayName||'User',pfp:'',username:'',statusText:'',email:CU.email||''};
+    }
+    try{updateHeaderPfp();}catch(e){}
+    showMain();
   }catch(e){
     const m={'auth/user-not-found':'No account with this email.','auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/network-request-failed':'No internet.','auth/invalid-email':'Invalid email.','auth/too-many-requests':'Too many attempts. Try later.'};
     showErr('login-err',m[e.code]||e.message);
-  }finally{btn.disabled=false;btn.textContent='Login';}
+    btn.disabled=false;btn.textContent='Login';
+  }
 };
 
 // ── SIGNUP ──
@@ -1579,7 +1502,11 @@ window.doSignup=async function(){
     btn.textContent='Saving profile...';
     const phone=document.getElementById('su-phone')?.value.trim()||'';
     await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,name,email:email.toLowerCase(),username,pfp:pfpUrl,phone,statusText:'Hey there! I am on 2k26_DSA',createdAt:serverTimestamp(),friends:[]});
+    CU=cred.user;
+    CUD={uid:CU.uid,name,email:email.toLowerCase(),username,pfp:pfpUrl,phone:'',statusText:'Hey there! I am on 2k26_DSA',friends:[]};
+    try{updateHeaderPfp();}catch(e){}
     toast('Welcome to 2k26_DSA! 🎉');
+    setTimeout(function(){showMain();},600);
   }catch(e){
     if(cred?.user){try{await deleteUser(cred.user);}catch(de){}}
     const m={'auth/email-already-in-use':'Email already registered.','auth/weak-password':'Password too weak.','auth/invalid-email':'Invalid email.','auth/network-request-failed':'No internet.'};
@@ -1849,50 +1776,6 @@ window.filterChats=function(val){
 // switchSideTab overridden below
 
 // ── OPEN CHAT ──
-window.openChat=async function(cid,type){
-  if(msgsUnsub){msgsUnsub();msgsUnsub=null;}
-  document.getElementById('msgs').innerHTML='';
-  document.getElementById('gc-rules-banner').classList.remove('show');
-  document.getElementById('gc-rules-text').textContent='';
-  document.getElementById('ch-name').textContent='Loading...';
-  document.getElementById('ch-sub').textContent='';
-  document.getElementById('ch-avatar').innerHTML='';
-  hideTagSuggest();cancelEdit();cancelReply();closeMsgSearch();
-  activeChatId=cid;activeChatType=type;
-  document.getElementById('sidebar').classList.add('hidden');
-  document.getElementById('no-chat').style.display='none';
-  document.getElementById('active-chat').style.display='flex';
-  document.querySelectorAll('.ci').forEach(el=>el.classList.toggle('active',el.dataset.id===cid));
-  const gcBanner=document.getElementById('gc-rules-banner');
-  try{
-    const snap=await getDoc(doc(db,'chats',cid));
-    if(!snap.exists())return;
-    activeChatData={id:snap.id,...snap.data()};
-    const d=activeChatData;
-    const chAv=document.getElementById('ch-avatar');
-    if(type==='group'){
-      document.getElementById('ch-name').textContent=d.name||'Group';
-      document.getElementById('ch-sub').textContent=(d.members||[]).length+' members';
-      chAv.innerHTML=d.icon?`<img src="${d.icon}"/>`:(d.name||'G')[0].toUpperCase();
-      gcMembers=d.members||[];
-      if(d.rules?.length){gcBanner.classList.add('show');document.getElementById('gc-rules-text').textContent=d.rules.join(' • ');}
-      else gcBanner.classList.remove('show');
-    }else{
-      gcBanner.classList.remove('show');gcMembers=[];
-      const other=d.members?.find(m=>m!==CU.uid);
-      const od=d.memberData?.[other]||{};
-      document.getElementById('ch-name').textContent=od.name||'User';
-      document.getElementById('ch-sub').textContent=od.username?'@'+od.username:'Private chat';
-      chAv.innerHTML=od.pfp?`<img src="${od.pfp}"/>`:(od.name||'U')[0].toUpperCase();
-    }
-    try{
-      await updateDoc(doc(db,'chats',cid),{[`unread.${CU.uid}`]:0});
-      // Mark all their messages as delivered when we open chat
-      markMessagesDelivered(cid);
-    }catch(e){}
-  }catch(e){console.error('openChat',e);}
-  loadMessages(cid);
-};
 window.closeChat=function(){
   document.getElementById('sidebar').classList.remove('hidden');
   document.getElementById('active-chat').style.display='none';
@@ -2361,13 +2244,6 @@ window.reactMsg=async function(msgId,emoji){
 };
 
 // ── TAG SUGGEST ──
-window.handleInput=function(el){
-  autoResize(el);
-  const before=el.value.slice(0,el.selectionStart);
-  const match=before.match(/@(\w*)$/);
-  if(match&&activeChatType==='group')showTagSuggest(match[1]);
-  else hideTagSuggest();
-};
 async function showTagSuggest(partial){
   if(!gcMembers.length){hideTagSuggest();return;}
   const sug=document.getElementById('tag-suggest');
