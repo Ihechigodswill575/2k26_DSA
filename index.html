@@ -1333,6 +1333,7 @@ let msgSearchResults=[],msgSearchIdx=0;
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(msg,dur=2800,cb){
   const t=document.getElementById('toast');
+  if(!t)return;
   t.textContent=msg;t.classList.add('show');t.onclick=cb||null;
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
 }
@@ -1374,17 +1375,9 @@ window.toggleEye=function(inputId,btn){
   else{inp.type='password';btn.textContent='👁';}
 };
 
-// ── SPLASH: dismiss after 3s ──
-setTimeout(function() {
-  var sp = document.getElementById('splash');
-  if (sp) sp.style.opacity = '0';
-  setTimeout(function() {
-    if (sp) sp.style.display = 'none';
-    checkAuth();
-  }, 700);
-}, 3000);
+// splash dismissed by inline script below
 
-function checkAuth(){
+window.checkAuth = function checkAuth(){
   try{
     onAuthStateChanged(auth,async u=>{
       try{
@@ -1419,9 +1412,9 @@ function updateHeaderPfp(){
     if(sav)sav.innerHTML=`<span style="font-size:14px;font-weight:700;color:#000">${initial}</span>`;
   }
 }
-function showAuth(){document.getElementById('auth').classList.add('show');}
+window.showAuth=function showAuth(){document.getElementById('auth').classList.add('show');}
 function hideAuth(){document.getElementById('auth').classList.remove('show');}
-function showMain(){
+window.showMain=function showMain(){
   hideAuth();
   document.getElementById('main').classList.add('show');
   try{loadChats();}catch(e){console.error('loadChats',e);}
@@ -1890,7 +1883,7 @@ function renderMsg(m,chatType){
   else if(m.type==='videosticker')content=`<div class="mb m-sticker" ${attr}><video src="${m.url}" style="width:110px;height:110px;object-fit:cover;border-radius:14px;display:block" autoplay loop muted playsinline></video></div>`;
   else if(m.type==='image')content=`<div class="mb" ${attr} style="padding:4px"><img class="m-img" src="${m.url}" onclick="openImgViewer('${m.url}')" data-sender="${esc(m.senderName||'')}" data-msgid="${m.id}" style="max-width:220px;border-radius:10px;display:block;cursor:pointer"/></div>`;
   else if(m.type==='video')content=`<div class="mb" ${attr} style="padding:4px;position:relative">
-    <video controls src="${m.url}" style="width:100%;max-width:280px;min-width:160px;border-radius:12px;display:block;background:#000;max-height:300px" playsinline preload="metadata">
+    <video controls src="${m.url}" style="width:100%;max-width:280px;min-width:160px;border-radius:12px;display:block;background:#000;max-height:300px" playsinline preload="auto">
     </video>
     <div style="position:absolute;bottom:18px;right:12px;background:rgba(0,0,0,0.55);border-radius:12px;padding:2px 7px;font-size:10px;color:#fff">▶ Video</div>
   </div>`;
@@ -3342,5 +3335,50 @@ setInterval(setOnline,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setOnline();});
 
 </script>
+
+<script>
+// SPLASH DISMISS - runs immediately, no Firebase dependency
+(function() {
+  var SPLASH_TIME = 1800; // 1.8 seconds - fast!
+  var dismissed = false;
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    var sp = document.getElementById('splash');
+    if (sp) {
+      sp.style.transition = 'opacity 0.5s ease';
+      sp.style.opacity = '0';
+      setTimeout(function() {
+        sp.style.display = 'none';
+        // Call checkAuth if module loaded, else poll until it's ready
+        if (typeof checkAuth === 'function') {
+          checkAuth();
+        } else {
+          var attempts = 0;
+          var poll = setInterval(function() {
+            attempts++;
+            if (typeof checkAuth === 'function') {
+              clearInterval(poll);
+              checkAuth();
+            } else if (attempts > 30) {
+              // Firebase took too long - show auth page directly
+              clearInterval(poll);
+              var auth = document.getElementById('auth');
+              if (auth) auth.style.display = 'flex';
+            }
+          }, 200);
+        }
+      }, 500);
+    }
+  }
+  // Dismiss after 1.8s regardless of everything
+  setTimeout(dismiss, SPLASH_TIME);
+  // Also dismiss immediately when page fully loads (whichever is faster)
+  window.addEventListener('load', function() {
+    setTimeout(dismiss, 800);
+  });
+})();
+</script>
+
 </body>
 </html>
