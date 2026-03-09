@@ -590,50 +590,68 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
       <h2>2k26_DSA</h2>
       <p>Connect. Chat. Vibe.</p>
     </div>
-    <div class="auth-body-wrap" style="padding:24px 24px calc(24px + var(--safe-bot))">
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchTab('login')">Login</div>
-      <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
-    </div>
-    <div id="login-form">
-      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="you@email.com" autocomplete="email"/></div>
-      <div class="fg"><label>Password</label>
-        <div class="pw-wrap">
-          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
-          <button class="eye-btn" type="button" onclick="toggleEye('login-pass',this)">👁</button>
+    <div class="auth-body-wrap">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchTab('login')">Login</div>
+        <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="login-form">
+        <div class="fg">
+          <label>EMAIL</label>
+          <input type="email" id="login-email" placeholder="you@email.com" autocomplete="email"/>
         </div>
-      </div>
-      <p class="err" id="login-err"></p>
-      <button class="btn" id="login-btn" onclick="doLogin()">Login</button>
-      <p style="text-align:center;margin-top:10px"><button onclick="doForgotPassword()" style="background:none;border:none;color:#128C7E;font-size:13px;cursor:pointer;font-family:inherit;padding:4px">Forgot password?</button></p>
-    </div>
-    <div id="signup-form" style="display:none">
-      <div class="pfp-row">
-        <div class="pfp-circle" id="pfp-preview" onclick="document.getElementById('pfp-file').click()">👤</div>
-        <div>
-          <label class="pfp-label" for="pfp-file">Choose Profile Pic</label>
-          <p class="pfp-hint">Optional</p>
+        <div class="fg">
+          <label>PASSWORD</label>
+          <div class="pw-wrap">
+            <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+            <button class="eye-btn" type="button" onclick="toggleEye('login-pass',this)">👁</button>
+          </div>
         </div>
-        <input type="file" id="pfp-file" accept="image/*" style="display:none" onchange="previewPfp(this)"/>
+        <p class="err" id="login-err"></p>
+        <button class="btn" id="login-btn" onclick="doLogin()">Login</button>
+        <p style="text-align:center;margin-top:14px">
+          <button onclick="doForgotPassword()" style="background:none;border:none;color:#128C7E;font-size:13px;cursor:pointer;font-family:inherit;padding:6px;touch-action:manipulation">
+            Forgot password?
+          </button>
+        </p>
       </div>
-      <div class="fg">
-        <label>Username</label>
-        <input type="text" id="su-username" placeholder="e.g. godswill_dsa" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"/>
-        <p class="hint">Lowercase, numbers and _ only</p>
-      </div>
-      <div class="fg"><label>Display Name</label><input type="text" id="su-name" placeholder="Your name"/></div>
-      <div class="fg"><label>Email</label><input type="email" id="su-email" placeholder="you@email.com"/></div>
-      <div class="fg"><label>Phone Number (optional)</label><input type="tel" id="su-phone" placeholder="e.g. +2348012345678"/><p class="hint">Used to match with your contacts</p></div>
-      <div class="fg"><label>Password</label>
-        <div class="pw-wrap">
-          <input type="password" id="su-pass" placeholder="Min 6 characters"/>
-          <button class="eye-btn" type="button" onclick="toggleEye('su-pass',this)">👁</button>
+
+      <!-- SIGNUP FORM -->
+      <div id="signup-form" style="display:none">
+        <div class="pfp-row">
+          <div class="pfp-circle" id="pfp-preview" onclick="document.getElementById('pfp-file').click()">👤</div>
+          <div>
+            <label class="pfp-label" for="pfp-file">Choose Profile Pic</label>
+            <p class="pfp-hint">Optional</p>
+          </div>
+          <input type="file" id="pfp-file" accept="image/*" style="display:none" onchange="previewPfp(this)"/>
         </div>
+        <div class="fg">
+          <label>USERNAME</label>
+          <input type="text" id="su-username" placeholder="e.g. godswill_dsa" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"/>
+          <p class="hint">Lowercase, numbers and _ only</p>
+        </div>
+        <div class="fg"><label>DISPLAY NAME</label><input type="text" id="su-name" placeholder="Your name"/></div>
+        <div class="fg"><label>EMAIL</label><input type="email" id="su-email" placeholder="you@email.com"/></div>
+        <div class="fg">
+          <label>PHONE (optional)</label>
+          <input type="tel" id="su-phone" placeholder="+2348012345678"/>
+          <p class="hint">Used to match your contacts</p>
+        </div>
+        <div class="fg">
+          <label>PASSWORD</label>
+          <div class="pw-wrap">
+            <input type="password" id="su-pass" placeholder="Min 6 characters"/>
+            <button class="eye-btn" type="button" onclick="toggleEye('su-pass',this)">👁</button>
+          </div>
+        </div>
+        <p class="err" id="su-err"></p>
+        <button class="btn" id="su-btn" onclick="doSignup()">Create Account</button>
       </div>
-      <p class="err" id="su-err"></p>
-      <button class="btn" id="su-btn" onclick="doSignup()">Create Account</button>
+
     </div>
-    </div><!-- /auth-body-wrap -->
   </div>
 </div>
 
@@ -1222,6 +1240,25 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
   </div>
 </div>
 
+<script>
+// ── SPLASH GUARDIAN: runs independently of Firebase module ──
+// If module fails to load or Firebase times out, this kills the splash
+(function(){
+  var HARD_LIMIT = 7000; // 7 seconds absolute max
+  var t = setTimeout(function(){
+    var sp = document.getElementById('splash');
+    if(sp){ sp.style.transition='opacity 0.3s'; sp.style.opacity='0'; sp.style.pointerEvents='none';
+      setTimeout(function(){ if(sp&&sp.parentNode)sp.parentNode.removeChild(sp); },300); }
+    // Show auth as last resort
+    var auth = document.getElementById('auth');
+    if(auth && !document.getElementById('main').classList.contains('show')){
+      auth.classList.add('show');
+    }
+  }, HARD_LIMIT);
+  // Allow module to cancel this if it loads fine
+  window._splashGuardian = t;
+})();
+</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -1307,31 +1344,143 @@ window.toggleEye=function(inputId,btn){
 };
 
 // ── SPLASH stays until Firebase answers ──
+var _spStart=Date.now();
+var _spMinTime=1500; // minimum splash display ms
 function hideSplash(cb){
   var sp=document.getElementById('splash');
   if(!sp){if(cb)cb();return;}
-  sp.style.pointerEvents='none';
-  sp.style.opacity='0';
-  setTimeout(function(){if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);if(cb)cb();},420);
+  var elapsed=Date.now()-_spStart;
+  var wait=Math.max(0,_spMinTime-elapsed);
+  setTimeout(function(){
+    sp.style.pointerEvents='none';
+    sp.style.opacity='0';
+    setTimeout(function(){if(sp&&sp.parentNode)sp.parentNode.removeChild(sp);if(cb)cb();},420);
+  },wait);
 }
 var _spFallback=setTimeout(function(){hideSplash(function(){showAuth();});},6000);
 
+
+checkAuth();
+
+
+
+
+
+
+window.switchTab=function(t){
+  document.getElementById('login-form').style.display=t==='login'?'block':'none';
+  document.getElementById('signup-form').style.display=t==='signup'?'block':'none';
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(t==='login'&&i===0)||(t==='signup'&&i===1)));
+};
+window.previewPfp=function(i){pendingPfpFile=i.files[0];if(pendingPfpFile)document.getElementById('pfp-preview').innerHTML=`<img src="${URL.createObjectURL(pendingPfpFile)}"/>`;};
+window.previewGcIcon=function(i){pendingGcIconFile=i.files[0];if(pendingGcIconFile)document.getElementById('gc-icon-preview').innerHTML=`<img src="${URL.createObjectURL(pendingGcIconFile)}"/>`;};
+window.previewEditPfp=function(i){
+  pendingEditPfpFile=i.files[0];
+  if(pendingEditPfpFile){
+    const url=URL.createObjectURL(pendingEditPfpFile);
+    const el=document.getElementById('edit-pfp-preview');
+    if(el)el.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+  }
+};
+window.previewStatus=function(i){
+  pendingStatusFile=i.files[0];
+  if(!pendingStatusFile)return;
+  const url=URL.createObjectURL(pendingStatusFile);
+  document.getElementById('status-preview').innerHTML=pendingStatusFile.type.startsWith('video')
+    ?`<video src="${url}" style="max-width:100%;border-radius:10px;max-height:160px" controls playsinline></video>`
+    :`<img src="${url}" style="max-width:100%;border-radius:10px;max-height:160px"/>`;
+};
+
+// ── LOGIN ──
+window.doLogin=async function(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  hideErr('login-err');
+  if(!email||!pass){showErr('login-err','Fill all fields.');return;}
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true;btn.textContent='Logging in...';
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+  }catch(e){
+    const m={'auth/user-not-found':'No account with this email.','auth/wrong-password':'Wrong password.','auth/invalid-credential':'Wrong email or password.','auth/network-request-failed':'No internet.','auth/invalid-email':'Invalid email.','auth/too-many-requests':'Too many attempts. Try later.'};
+    showErr('login-err',m[e.code]||e.message);
+  }finally{btn.disabled=false;btn.textContent='Login';}
+};
+
+// ── SIGNUP ──
+window.doSignup=async function(){
+  const username=document.getElementById('su-username').value.trim();
+  const name=document.getElementById('su-name').value.trim();
+  const email=document.getElementById('su-email').value.trim();
+  const pass=document.getElementById('su-pass').value;
+  hideErr('su-err');
+  if(!username||username.length<3){showErr('su-err','Username must be 3+ characters.');return;}
+  if(!name||!email||!pass){showErr('su-err','Fill all fields.');return;}
+  if(pass.length<6){showErr('su-err','Password min 6 characters.');return;}
+  const btn=document.getElementById('su-btn');
+  btn.disabled=true;btn.textContent='Creating account...';
+  let cred=null;
+  try{
+    cred=await createUserWithEmailAndPassword(auth,email,pass);
+    await updateProfile(cred.user,{displayName:name});
+    btn.textContent='Checking username...';
+    const usnap=await getDocs(query(collection(db,'users'),where('username','==',username)));
+    if(!usnap.empty){
+      await deleteUser(cred.user);
+      showErr('su-err','Username taken. Try another.');
+      btn.disabled=false;btn.textContent='Create Account';return;
+    }
+    let pfpUrl='';
+    if(pendingPfpFile){
+      btn.textContent='Uploading photo...';
+      try{pfpUrl=await uploadCloud(pendingPfpFile,'pfps');await updateProfile(cred.user,{photoURL:pfpUrl});}catch(ue){}
+    }
+    btn.textContent='Saving profile...';
+    const phone=document.getElementById('su-phone')?.value.trim()||'';
+    await setDoc(doc(db,'users',cred.user.uid),{uid:cred.user.uid,name,email:email.toLowerCase(),username,pfp:pfpUrl,phone,statusText:'Hey there! I am on 2k26_DSA',createdAt:serverTimestamp(),friends:[]});
+    toast('Welcome to 2k26_DSA! 🎉');
+  }catch(e){
+    if(cred?.user){try{await deleteUser(cred.user);}catch(de){}}
+    const m={'auth/email-already-in-use':'Email already registered.','auth/weak-password':'Password too weak.','auth/invalid-email':'Invalid email.','auth/network-request-failed':'No internet.'};
+    showErr('su-err',m[e.code]||e.message);
+    btn.disabled=false;btn.textContent='Create Account';
+  }
+};
+
+window.toggleEye=function(inputId,btn){
+  const inp=document.getElementById(inputId);
+  if(!inp)return;
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
+};
+
+// ── SPLASH with animated steps ──
+const spSteps=['Initializing...','Loading Firebase...','Connecting...','Almost ready...'];
+let spStepIdx=0;
+const spStepEl=document.getElementById('sp-step');// may be null in new boot design
+const spStepTimer=setInterval(()=>{
+  spStepIdx=(spStepIdx+1)%spSteps.length;
+  if(spStepEl)spStepEl.textContent=spSteps[spStepIdx]||'';
+},700);
+setTimeout(()=>{
+  clearInterval(spStepTimer);
+  if(spStepEl)spStepEl.textContent='Welcome!';
+  document.getElementById('splash').classList.add('hide');
+  setTimeout(()=>{document.getElementById('splash').style.display='none';checkAuth();},700);
+},3200);
+
 function checkAuth(){
   onAuthStateChanged(auth,async u=>{
-    clearTimeout(_spFallback);
     if(u){
       CU=u;
       try{await loadCUD(u.uid);}catch(e){
         CUD={name:CU.displayName||'User',pfp:'',username:'',statusText:'',email:CU.email||''};
+        updateHeaderPfp();
       }
-      try{updateHeaderPfp();}catch(e){}
-      hideSplash(function(){showMain();});
-    }else{
-      hideSplash(function(){showAuth();});
-    }
-  },function(){clearTimeout(_spFallback);hideSplash(function(){showAuth();});});
+      showMain();
+    }else{showAuth();}
+  },()=>showAuth());
 }
-checkAuth();
 async function loadCUD(uid){
   const s=await getDoc(doc(db,'users',uid));
   CUD=s.exists()?{...s.data(),email:CU.email||s.data().email||''}:{name:CU.displayName||'User',pfp:'',username:'',statusText:'',email:CU.email||''};
@@ -1438,6 +1587,7 @@ window.doSignup=async function(){
     btn.disabled=false;btn.textContent='Create Account';
   }
 };
+
 
 window.doLogout=async function(){
   if(chatsUnsub)chatsUnsub();if(reqUnsub)reqUnsub();if(msgsUnsub)msgsUnsub();if(statusUnsub)statusUnsub();
@@ -3228,23 +3378,8 @@ window.addEventListener('beforeinstallprompt',e=>{
 
 
 
-// ── SEND/MIC ──
-function updateSendMicBtn(){
-  const txt=document.getElementById('msg-txt')?.value?.trim();
-  const si=document.getElementById('send-icon'),mi=document.getElementById('mic-icon');
-  if(si&&mi){si.style.display=txt?'block':'none';mi.style.display=txt?'none':'block';}
-}
-window.handleSendOrMic=function(){
-  const txt=document.getElementById('msg-txt')?.value?.trim();
-  if(txt)sendMessage();else toggleVN();
-};
-setTimeout(updateSendMicBtn,500);
-async function setOnline(){
-  if(!CU)return;
-  try{await setDoc(doc(db,'users',CU.uid),{lastSeen:serverTimestamp()},{merge:true});}catch(e){}
-}
-setInterval(setOnline,30000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)setOnline();});
+// (updateSendMicBtn defined above)
+// (setOnline defined above)
 
 // ── MISSING SETTINGS FUNCTIONS ──
 window.openSettingsSub=function(name){
