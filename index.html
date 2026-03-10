@@ -612,6 +612,75 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 [data-theme="amoled"] .settings-section{border:1px solid #1A1A1A;}
 [data-theme="amoled"] .settings-item{border-bottom-color:#1A1A1A;}
 
+
+/* ── THEME BUTTONS ── */
+.theme-btn{
+  border:2px solid var(--border) !important;
+  background:none !important;
+  border-radius:20px;
+  color:var(--text2) !important;
+  padding:6px 16px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  flex-shrink:0;
+  font-family:inherit;
+}
+.theme-btn.active,
+.theme-btn[data-active="true"]{
+  border-color:var(--accent2) !important;
+  color:var(--accent2) !important;
+  background:rgba(37,211,102,0.12) !important;
+}
+
+/* ── THEME PREVIEW SWATCHES ── */
+.theme-swatch-dark{background:linear-gradient(135deg,#111B21 50%,#005C4B 100%)}
+.theme-swatch-light{background:linear-gradient(135deg,#ECE5DD 50%,#D9FDD3 100%)}
+.theme-swatch-amoled{background:linear-gradient(135deg,#000 50%,#003D1A 100%)}
+
+/* ── LIGHT THEME overrides ── */
+[data-theme="light"] body,
+[data-theme="light"] #main,
+[data-theme="light"] .sidebar{color:var(--text);}
+[data-theme="light"] .settings-header{background:#128C7E;color:#fff;}
+[data-theme="light"] .settings-header button{color:#fff;}
+[data-theme="light"] .settings-header h2{color:#fff;}
+[data-theme="light"] .chat-header{background:#128C7E !important;}
+[data-theme="light"] .chat-header *{color:#fff !important;}
+[data-theme="light"] .sidebar-header{background:#128C7E !important;color:#fff;}
+[data-theme="light"] .sidebar-header *{color:#fff !important;}
+[data-theme="light"] .chat-item{background:#fff;}
+[data-theme="light"] .chat-item:hover{background:#f5f5f5;}
+[data-theme="light"] .chat-item.active{background:#E8F5E9;}
+[data-theme="light"] .mw.out .mb{color:#111 !important;}
+[data-theme="light"] .mw.in .mb{color:#111 !important;}
+[data-theme="light"] .m-time{color:#667781 !important;}
+[data-theme="light"] .hmenu{background:#fff;border:1px solid #eee;box-shadow:0 4px 20px rgba(0,0,0,0.15);}
+[data-theme="light"] .hmi span{color:#111;}
+[data-theme="light"] .settings-section{background:#fff !important;}
+[data-theme="light"] .settings-item-title{color:#111 !important;}
+[data-theme="light"] .settings-item-desc{color:#667781 !important;}
+[data-theme="light"] #msgs{background:#EFE7DD !important;}
+[data-theme="light"] .iw textarea{color:#111 !important;}
+[data-theme="light"] .iw{background:#f0f2f5 !important;}
+[data-theme="light"] .chat-input-area{background:#f0f2f5 !important;border-top:1px solid #e0e0e0 !important;}
+
+/* ── AMOLED THEME overrides ── */
+[data-theme="amoled"] .settings-header{background:#000 !important;}
+[data-theme="amoled"] .chat-header{background:#000 !important;}
+[data-theme="amoled"] .sidebar-header{background:#000 !important;}
+[data-theme="amoled"] .chat-item:hover{background:#0A0A0A !important;}
+[data-theme="amoled"] .chat-item.active{background:#0D1F14 !important;}
+[data-theme="amoled"] .mw.out .mb{border:1px solid #003D1A;}
+[data-theme="amoled"] .settings-section{border:1px solid #1A1A1A !important;}
+[data-theme="amoled"] .settings-overlay{border-right:1px solid #111;}
+[data-theme="amoled"] #msgs{background:#000 !important;}
+[data-theme="amoled"] .iw{background:#0A0A0A !important;border:1px solid #1A1A1A;}
+[data-theme="amoled"] .chat-input-area{background:#000 !important;border-top:1px solid #1A1A1A !important;}
+[data-theme="amoled"] .hmenu{background:#0A0A0A;border:1px solid #1A1A1A;}
+[data-theme="amoled"] .settings-item{border-bottom-color:#1A1A1A !important;}
+
 </style>
 </head>
 <body>
@@ -950,49 +1019,55 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 </div>
 
 <!-- PROFILE PAGE (full screen dark like image 4) -->
-<div class="settings-page" id="profile-overlay" style="background:var(--bg);overflow:hidden">
-  <!-- Floating top bar -->
-  <div style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + var(--safe-top)) 16px 14px;background:linear-gradient(to bottom,rgba(0,0,0,0.6),transparent)">
-    <button onclick="closeModal('profile-overlay')" style="background:rgba(0,0,0,0.4);border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:#fff">←</button>
-    <span style="color:#fff;font-size:17px;font-weight:700;letter-spacing:0.3px">My Profile</span>
-    <button id="save-profile-btn" onclick="saveProfile()" style="background:var(--accent2);border:none;padding:8px 18px;border-radius:20px;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">Save</button>
+<div class="settings-page" id="profile-overlay" style="background:var(--bg);display:flex;flex-direction:column">
+  <!-- Fixed top bar - OUTSIDE scroll, never overlapped -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(14px + var(--safe-top)) 16px 12px;background:var(--header-bg);flex-shrink:0;position:relative;z-index:10">
+    <button onclick="closeModal('profile-overlay')" style="background:var(--bg3);border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--text)">←</button>
+    <span style="color:var(--text);font-size:17px;font-weight:700">My Profile</span>
+    <button id="save-profile-btn" onclick="saveProfile()" style="background:var(--accent2);border:none;padding:9px 20px;border-radius:20px;color:#111;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.3px">Save</button>
   </div>
 
-  <div style="height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch">
-    <!-- Cover / Hero -->
-    <div style="position:relative;height:220px;background:linear-gradient(135deg,var(--accent),var(--accent2) 60%,#4CAF50);flex-shrink:0">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,var(--bg) 100%)"></div>
-      <!-- Avatar centered -->
-      <div style="position:absolute;bottom:-44px;left:50%;transform:translateX(-50%);cursor:pointer;z-index:2" onclick="document.getElementById('edit-pfp-file').click()">
-        <div id="edit-pfp-preview" style="width:92px;height:92px;border-radius:50%;background:var(--bg3);border:3px solid var(--bg);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--text2);box-shadow:0 4px 20px rgba(0,0,0,0.5)">👤</div>
-        <div style="position:absolute;bottom:2px;right:2px;background:var(--accent2);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2.5px solid var(--bg)">📷</div>
+  <!-- Scrollable body -->
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">
+
+    <!-- Avatar block - centered, clean, no overlap -->
+    <div style="background:linear-gradient(160deg,var(--accent) 0%,var(--accent2) 100%);padding:32px 16px 20px;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <!-- Avatar tap to change -->
+      <div style="position:relative;cursor:pointer" onclick="document.getElementById('edit-pfp-file').click()">
+        <div id="edit-pfp-preview" style="width:96px;height:96px;border-radius:50%;background:var(--bg3);border:3px solid rgba(255,255,255,0.4);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:38px;color:var(--text2);box-shadow:0 6px 24px rgba(0,0,0,0.4)">👤</div>
+        <div style="position:absolute;bottom:2px;right:2px;background:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">📷</div>
       </div>
       <input type="file" id="edit-pfp-file" accept="image/*" style="display:none" onchange="previewEditPfp(this)"/>
-    </div>
-
-    <!-- Name + username below avatar -->
-    <div style="padding-top:56px;padding-bottom:6px;text-align:center">
-      <div id="profile-display-name" style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.3px"></div>
-      <div id="profile-display-user" style="font-size:13px;color:var(--accent2);margin-top:3px;font-weight:600"></div>
+      <!-- Name + username -->
+      <div style="text-align:center">
+        <div id="profile-display-name" style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.3px;text-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>
+        <div id="profile-display-user" style="font-size:13px;color:rgba(255,255,255,0.8);margin-top:2px;font-weight:600"></div>
+      </div>
     </div>
 
     <!-- Stats row -->
-    <div id="profile-stats" style="display:flex;gap:1px;margin:10px 16px 20px;background:var(--border);border-radius:12px;overflow:hidden"></div>
+    <div id="profile-stats" style="display:flex;margin:14px 14px 0;gap:10px"></div>
 
-    <!-- Edit fields -->
-    <div style="margin:0 14px 14px;background:var(--bg2);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)">
-      <div style="padding:4px 16px 0;font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-top:14px">Display Name</div>
-      <input type="text" id="edit-name" style="width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:16px;outline:none;padding:8px 16px 12px" placeholder="Your name"/>
-      <div style="padding:4px 16px 0;font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-top:10px">Phone Number</div>
-      <input type="tel" id="edit-phone" style="width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:15px;outline:none;padding:8px 16px 12px" placeholder="+2348012345678"/>
-      <div style="padding:4px 16px 0;font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-top:10px">About / Status</div>
-      <input type="text" id="edit-status-text" style="width:100%;background:none;border:none;color:var(--text);font-family:inherit;font-size:15px;outline:none;padding:8px 16px 14px" placeholder="Hey there! I am on 2k26_DSA"/>
+    <!-- Edit fields card -->
+    <div style="margin:14px 14px 0;background:var(--bg2);border-radius:14px;overflow:hidden">
+      <div style="padding:14px 16px 0">
+        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Display Name</div>
+        <input type="text" id="edit-name" style="width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:16px;outline:none;padding-bottom:12px" placeholder="Your name"/>
+      </div>
+      <div style="padding:14px 16px 0">
+        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Phone Number</div>
+        <input type="tel" id="edit-phone" style="width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:15px;outline:none;padding-bottom:12px" placeholder="+2348012345678"/>
+      </div>
+      <div style="padding:14px 16px 14px">
+        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">About / Status</div>
+        <input type="text" id="edit-status-text" style="width:100%;background:none;border:none;color:var(--text);font-family:inherit;font-size:15px;outline:none" placeholder="Hey there! I am on 2k26_DSA"/>
+      </div>
     </div>
 
-    <!-- Info section (email, member since) -->
-    <div id="profile-view-section" style="margin:0 14px 30px;background:var(--bg2);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)"></div>
+    <!-- Info section -->
+    <div id="profile-view-section" style="margin:14px 14px 30px;background:var(--bg2);border-radius:14px;overflow:hidden"></div>
 
-    <p class="err" id="edit-err" style="margin:0 14px 20px;text-align:center"></p>
+    <p class="err" id="edit-err" style="margin:0 14px 20px;text-align:center;padding:0 16px"></p>
   </div>
 </div>
 
@@ -1108,70 +1183,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
   </div>
 </div>
 
-<!-- PRIVACY SUB-PAGE -->
-<div class="settings-sub" id="settings-sub-privacy">
-  <div class="settings-header">
-    <button class="settings-back" onclick="closeSettingsSub('privacy')">‹</button>
-    <h2>Privacy</h2>
-  </div>
-  <div class="settings-body">
-    <div class="settings-section">
-      <div class="settings-section-title">Messaging</div>
-      <div class="settings-item">
-        <div class="settings-icon teal">✅</div>
-        <div class="settings-item-info"><div class="settings-item-title">Read Receipts</div><div class="settings-item-desc">Show blue ticks when you read messages</div></div>
-        <button class="settings-toggle on" id="read-receipt-toggle" onclick="toggleReadReceipts(this)"></button>
-      </div>
-      <div class="settings-item">
-        <div class="settings-icon green">🟢</div>
-        <div class="settings-item-info"><div class="settings-item-title">Last Seen &amp; Online</div><div class="settings-item-desc">Show when you were last active</div></div>
-        <button class="settings-toggle on" id="online-status-toggle" onclick="toggleOnlineStatus(this)"></button>
-      </div>
-    </div>
-    <div class="settings-section">
-      <div class="settings-section-title">About</div>
-      <div class="settings-item">
-        <div style="font-size:13px;color:#8696A0;line-height:1.6">
-          If you turn off read receipts, you won't be able to see read receipts from others either. 
-          Read receipts are always shown for group messages.
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- STICKER PANEL -->
-<div class="sticker-panel" id="sticker-panel">
-  <div class="sp-header" id="sp-header">
-    <div class="sp-tab active" onclick="switchStickerTab('recent',this)">🕐 Recent</div>
-    <div class="sp-tab" onclick="switchStickerTab('favs',this)">⭐ Favs</div>
-    <div class="sp-tab" onclick="switchStickerTab('mine',this)">✨ Mine</div>
-    <div class="sp-tab" onclick="switchStickerTab('pack1',this)">😀 Emoji Art</div>
-    <div class="sp-tab" onclick="switchStickerTab('pack2',this)">🐾 Animals</div>
-  </div>
-  <div class="sp-body" id="sp-body">
-    <div class="sticker-empty">Tap a sticker to send it instantly!</div>
-  </div>
-</div>
-
-<!-- IMAGE CONTEXT SHEET -->
-<!-- IMAGE CONTEXT SHEET -->
-<div class="img-ctx-sheet" id="img-ctx-sheet" onclick="closeImgCtx(event)">
-  <div class="img-ctx-inner" id="img-ctx-inner">
-    <div class="img-ctx-header" id="img-ctx-header">
-      <img class="img-ctx-preview" id="img-ctx-preview" src="" alt=""/>
-      <div class="img-ctx-sender">
-        <div class="img-ctx-sender-name" id="img-ctx-sender-name"></div>
-        <div class="img-ctx-sender-time" id="img-ctx-sender-time"></div>
-      </div>
-    </div>
-    <div id="img-ctx-items"></div>
-  </div>
-</div>
-
 <script>
-// ── SPLASH GUARDIAN ──
 (function(){
+  var _spStart=Date.now(),_spMinTime=1500;
   var t=setTimeout(function(){
     var sp=document.getElementById('splash');
     if(sp){sp.style.transition='opacity 0.3s';sp.style.opacity='0';setTimeout(function(){sp.style.display='none';},400);}
@@ -1179,9 +1193,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
     if(au){au.style.display='block';au.classList.add('show');}
   },7000);
   window._splashGuardian=t;
+  window._spStart=_spStart;
+  window._spMinTime=_spMinTime;
 })();
 </script>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -1366,9 +1381,12 @@ const THEMES=['dark','light','amoled'];
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   localStorage.setItem('app-theme',t);
-  // Update theme buttons in settings
   document.querySelectorAll('.theme-btn').forEach(b=>{
-    b.classList.toggle('active',b.dataset.theme===t);
+    const isActive=b.dataset.theme===t;
+    b.classList.toggle('active',isActive);
+    b.style.borderColor=isActive?'var(--accent2)':'var(--border)';
+    b.style.color=isActive?'var(--accent2)':'var(--text2)';
+    b.textContent=isActive?'✓ ON':'Apply';
   });
 }
 window.setTheme=function(t){applyTheme(t);toast('Theme: '+t.charAt(0).toUpperCase()+t.slice(1)+' ✅');};
@@ -1474,6 +1492,7 @@ async function loadCUD(uid){
 function updateHeaderPfp(){
   const img=document.getElementById('header-pfp'),ph=document.getElementById('header-pfp-ph');
   const sav=document.getElementById('s-header-av');
+  if(!img||!ph)return;
   if(CUD?.pfp){
     img.src=CUD.pfp;img.style.display='block';ph.style.display='none';
     if(sav)sav.innerHTML=`<img src="${CUD.pfp}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
@@ -1505,7 +1524,11 @@ window.previewEditPfp=function(i){
   if(pendingEditPfpFile){
     const url=URL.createObjectURL(pendingEditPfpFile);
     const el=document.getElementById('edit-pfp-preview');
-    if(el)el.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+    if(el){
+      el.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+      el.style.fontSize='0';
+    }
+    toast('Photo ready — tap Save to upload 📸');
   }
 };
 window.previewStatus=function(i){
@@ -1609,45 +1632,63 @@ document.addEventListener('click',e=>{
 window.openProfileEdit=function(){
   const overlay=document.getElementById('profile-overlay');
   if(!overlay)return;
-  // Avatar
+  // Fill avatar
   const prev=document.getElementById('edit-pfp-preview');
   if(prev){
-    if(CUD&&CUD.pfp)prev.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
-    else prev.textContent=(CUD&&CUD.name||'?')[0].toUpperCase();
-    prev.style.fontSize=(CUD&&CUD.pfp?'0':'36px');
+    if(CUD&&CUD.pfp){
+      prev.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+      prev.style.fontSize='0';
+    }else{
+      prev.innerHTML='';
+      prev.textContent=(CUD&&CUD.name||'?')[0].toUpperCase();
+      prev.style.fontSize='38px';
+    }
   }
-  // Name + username display
+  // Display name + username in hero
   const dn=document.getElementById('profile-display-name');
   const du=document.getElementById('profile-display-user');
   if(dn)dn.textContent=CUD&&CUD.name||'';
-  if(du)du.textContent='@'+(CUD&&CUD.username||'');
-  // Edit fields
+  if(du)du.textContent=CUD&&CUD.username?'@'+CUD.username:'';
+  // Editable fields
   const en=document.getElementById('edit-name');
   const ep=document.getElementById('edit-phone');
   const es=document.getElementById('edit-status-text');
   if(en)en.value=CUD&&CUD.name||'';
   if(ep)ep.value=CUD&&CUD.phone||'';
   if(es)es.value=CUD&&CUD.statusText||'';
-  // Stats
+  // Stats cards
   const stats=document.getElementById('profile-stats');
   if(stats){
-    const friends=(CUD&&CUD.friends||[]).length;
-    const since=CUD&&CUD.createdAt&&CUD.createdAt.toDate?new Date(CUD.createdAt.toDate()).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'}):'—';
-    const email=CUD&&CUD.email||CU&&CU.email||'—';
+    const friendCount=(CUD&&CUD.friends||[]).length;
+    const since=CUD&&CUD.createdAt&&CUD.createdAt.toDate
+      ?new Date(CUD.createdAt.toDate()).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'})
+      :'—';
     stats.innerHTML=[
-      {label:'Friends',val:friends,icon:'👥'},
-      {label:'Since',val:since,icon:'📅'},
-    ].map(s=>'<div style="flex:1;background:var(--bg2);padding:12px 8px;text-align:center"><div style="font-size:18px;margin-bottom:2px">'+s.icon+'</div><div style="font-size:18px;font-weight:800;color:var(--text)">'+s.val+'</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">'+s.label+'</div></div>').join('');
+      {icon:'👥',val:friendCount,label:'Friends'},
+      {icon:'📅',val:since,label:'Since'},
+    ].map(s=>`<div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center">
+      <div style="font-size:22px;margin-bottom:4px">${s.icon}</div>
+      <div style="font-size:20px;font-weight:800;color:var(--text)">${s.val}</div>
+      <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">${s.label}</div>
+    </div>`).join('');
   }
-  // Info
+  // Info card
   const info=document.getElementById('profile-view-section');
   if(info){
-    const e=CUD&&CUD.email||CU&&CU.email||'—';
-    const u=CUD&&CUD.username||'—';
-    info.innerHTML='<div style="padding:14px 16px;border-bottom:1px solid var(--border)"><div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px">Email</div><div style="color:var(--text);font-size:14px">'+e+'</div></div>'+
-    '<div style="padding:14px 16px"><div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px">Username</div><div style="color:var(--text);font-size:14px">@'+u+'</div></div>';
+    const email=CUD&&CUD.email||CU&&CU.email||'—';
+    const uname=CUD&&CUD.username||'—';
+    info.innerHTML=`
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Email</div>
+        <div style="color:var(--text);font-size:14px">${email}</div>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Username</div>
+        <div style="color:var(--text);font-size:14px">@${uname}</div>
+      </div>`;
   }
   pendingEditPfpFile=null;
+  hideErr('edit-err');
   overlay.classList.add('show');
 };
 
@@ -3350,13 +3391,15 @@ window.openSettingsSub=function(name){
   if(name==='notifications')setTimeout(initNotifToggles,50);
   if(name==='storage')setTimeout(loadStorageInfo,50);
   if(name==='chats'){
-    // Highlight active theme
-    const cur=document.documentElement.getAttribute('data-theme')||'dark';
-    el.querySelectorAll('.theme-btn').forEach(b=>{
-      const active=b.dataset.theme===cur;
-      b.style.borderColor=active?'var(--accent2)':'var(--text3)';
-      b.style.color=active?'var(--accent2)':'var(--text2)';
-    });
+    setTimeout(()=>{
+      const cur=document.documentElement.getAttribute('data-theme')||'dark';
+      el.querySelectorAll('.theme-btn').forEach(b=>{
+        const isActive=b.dataset.theme===cur;
+        b.classList.toggle('active',isActive);
+        b.setAttribute('data-active',isActive?'true':'false');
+        b.textContent=isActive?'✓ Active':'Apply';
+      });
+    },50);
   }
 };
 window.closeSettingsSub=function(name){
@@ -3374,104 +3417,66 @@ window.doForgotPassword=async function(){
   const email=document.getElementById('login-email').value.trim();
   if(!email){showErr('login-err','Enter your email first.');return;}
   try{
-    await sendPasswordResetEmail(auth,email);;
-    hideErr('login-err');
-    toast('Password reset email sent! Check your inbox.',4000);
-  }catch(e){showErr('login-err',e.message||'Failed to send reset email.');}
-};
-
-window.doForgotPassword=async function(){
-  const email=document.getElementById('login-email').value.trim();
-  if(!email){showErr('login-err','Enter your email first.');return;}
-  try{
-    const {sendPasswordResetEmail}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     await sendPasswordResetEmail(auth,email);
     hideErr('login-err');
     toast('Password reset email sent! Check your inbox.',4000);
   }catch(e){showErr('login-err',e.message||'Failed to send reset email.');}
 };
-
-window.closeSettingsSub=function(name){
-  const el=document.getElementById('settings-sub-'+name);
-  if(el)el.classList.remove('show');
-};
-
-window.toggleOnlineStatus=function(btn){
-  const on=btn.classList.contains('on');
-  btn.classList.toggle('on',!on);
-  localStorage.setItem('onlineStatus',!on?'on':'off');
-  toast(!on?'Online status visible':'Online status hidden');
-};
-window.openModal=function(id){const el=document.getElementById(id);if(el)el.classList.add('show');};
-window.doForgotPassword=async function(){
-  const email=document.getElementById('login-email').value.trim();
-  if(!email){showErr('login-err','Enter your email first.');return;}
-  try{
-    const {sendPasswordResetEmail}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    await sendPasswordResetEmail(auth,email);
-    hideErr('login-err');
-    toast('Password reset email sent! Check your inbox.',4000);
-  }catch(e){showErr('login-err',e.message||'Failed to send reset email.');}
-};
-
-window.doForgotPassword=async function(){
-  const email=document.getElementById('login-email').value.trim();
-  if(!email){showErr('login-err','Enter your email first.');return;}
-  try{
-    const {sendPasswordResetEmail}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-    await sendPasswordResetEmail(auth,email);
-    hideErr('login-err');
-    toast('Password reset email sent! Check your inbox.',4000);
-  }catch(e){showErr('login-err',e.message||'Failed to send reset email.');}
-};
-
-
 </script>
 
 
-<!-- SETTINGS SUB-PAGES -->
+<!-- PRIVACY SUB-PAGE -->
+<div class="settings-sub" id="settings-sub-privacy">
+  <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('privacy')">‹</button><h2>Privacy</h2></div>
+  <div class="settings-body" style="padding:0">
+    <div class="settings-section">
+      <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">Messaging</div>
+      <div class="settings-item"><div class="settings-icon teal">✅</div><div class="settings-item-info"><div class="settings-item-title">Read Receipts</div><div class="settings-item-desc">Show when you have read messages</div></div><button class="settings-toggle on" id="read-receipt-toggle" onclick="toggleReadReceipts(this)"></button></div>
+      <div class="settings-item"><div class="settings-icon green">🟢</div><div class="settings-item-info"><div class="settings-item-title">Show Online Status</div><div class="settings-item-desc">Let others see when you are active</div></div><button class="settings-toggle on" id="online-status-toggle" onclick="toggleOnlineStatus(this)"></button></div>
+    </div>
+  </div>
+</div>
 
 <!-- ACCOUNT SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-account">
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('account')">‹</button><h2>Account</h2></div>
   <div class="settings-body" style="padding:0">
     <div class="settings-section">
-      <div class="settings-item" onclick="doChangePassword()"><div class="settings-icon teal">🔑</div><div class="settings-item-info"><div class="settings-item-title">Change Password</div><div class="settings-item-desc">Send a reset link to your email</div></div><div class="settings-item-right">›</div></div>
-      <div class="settings-item" onclick="toast('Two-step verification coming soon')"><div class="settings-icon green">🛡️</div><div class="settings-item-info"><div class="settings-item-title">Two-step verification</div><div class="settings-item-desc">Add extra security to your account</div></div><div class="settings-item-right">›</div></div>
+      <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">Security</div>
+      <div class="settings-item" onclick="doChangePassword()"><div class="settings-icon teal">🔑</div><div class="settings-item-info"><div class="settings-item-title">Change Password</div><div class="settings-item-desc">Send a password reset email</div></div><div class="settings-item-right">›</div></div>
     </div>
     <div class="settings-section">
-      <div class="settings-item" onclick="doLogout()"><div class="settings-icon" style="background:#2A1515">🚪</div><div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Log Out</div></div></div>
-      <div class="settings-item" onclick="if(confirm('Delete your account permanently? All your data will be lost. This cannot be undone.'))doDeleteAccount()"><div class="settings-icon" style="background:#2A1515">🗑️</div><div class="settings-item-info"><div class="settings-item-title" style="color:#f15c6d">Delete Account</div><div class="settings-item-desc">Permanently erase all data</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="doLogout()"><div class="settings-icon orange">🚪</div><div class="settings-item-info"><div class="settings-item-title" style="color:var(--text)">Log Out</div><div class="settings-item-desc">Sign out of your account</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="doDeleteAccount()"><div class="settings-icon red">⚠️</div><div class="settings-item-info"><div class="settings-item-title" style="color:var(--danger)">Delete Account</div><div class="settings-item-desc">Permanently erase all data</div></div><div class="settings-item-right">›</div></div>
     </div>
   </div>
 </div>
 
 <!-- CHATS SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-chats">
-  <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('chats')">‹</button><h2>Chats &amp; Themes</h2></div>
+  <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('chats')">‹</button><h2>Chats &amp; Theme</h2></div>
   <div class="settings-body" style="padding:0;overflow-y:auto">
-    <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">App Theme</div>
+    <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">Choose Theme</div>
     <div class="settings-section">
-      <div class="settings-item" onclick="setTheme('dark')">
-        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#111B21,#2A3942);flex-shrink:0;border:2px solid #25D366"></div>
-        <div class="settings-item-info"><div class="settings-item-title">Dark</div><div class="settings-item-desc">WhatsApp dark — easy on the eyes</div></div>
-        <button class="theme-btn" data-theme="dark" onclick="event.stopPropagation();setTheme('dark')" style="border:2px solid var(--accent2);background:none;border-radius:20px;color:var(--accent2);padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer">Apply</button>
+      <div class="settings-item" onclick="setTheme('dark');closeSettingsSub('chats')">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#111B21,#005C4B);flex-shrink:0;border:2px solid #25D366"></div>
+        <div class="settings-item-info"><div class="settings-item-title">Dark</div><div class="settings-item-desc">Classic dark green WhatsApp</div></div>
+        <button class="theme-btn" data-theme="dark" onclick="event.stopPropagation();setTheme('dark');closeSettingsSub('chats')">Apply</button>
       </div>
-      <div class="settings-item" onclick="setTheme('light')">
-        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ECE5DD,#FFFFFF);flex-shrink:0;border:2px solid #128C7E"></div>
-        <div class="settings-item-info"><div class="settings-item-title">Light</div><div class="settings-item-desc">Classic WhatsApp light theme</div></div>
-        <button class="theme-btn" data-theme="light" onclick="event.stopPropagation();setTheme('light')" style="border:2px solid var(--text3);background:none;border-radius:20px;color:var(--text2);padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer">Apply</button>
+      <div class="settings-item" onclick="setTheme('light');closeSettingsSub('chats')">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#ECE5DD,#D9FDD3);flex-shrink:0;border:2px solid #128C7E"></div>
+        <div class="settings-item-info"><div class="settings-item-title">Light</div><div class="settings-item-desc">Bright clean WhatsApp light</div></div>
+        <button class="theme-btn" data-theme="light" onclick="event.stopPropagation();setTheme('light');closeSettingsSub('chats')">Apply</button>
       </div>
-      <div class="settings-item" onclick="setTheme('amoled')">
-        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#000000,#003D1A);flex-shrink:0;border:2px solid #00E676"></div>
-        <div class="settings-item-info"><div class="settings-item-title">AMOLED Black</div><div class="settings-item-desc">Pure black — saves battery on OLED screens</div></div>
-        <button class="theme-btn" data-theme="amoled" onclick="event.stopPropagation();setTheme('amoled')" style="border:2px solid var(--text3);background:none;border-radius:20px;color:var(--text2);padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer">Apply</button>
+      <div class="settings-item" onclick="setTheme('amoled');closeSettingsSub('chats')">
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#000,#003D1A);flex-shrink:0;border:2px solid #00E676"></div>
+        <div class="settings-item-info"><div class="settings-item-title">AMOLED Black</div><div class="settings-item-desc">Pure black, saves OLED battery</div></div>
+        <button class="theme-btn" data-theme="amoled" onclick="event.stopPropagation();setTheme('amoled');closeSettingsSub('chats')">Apply</button>
       </div>
     </div>
     <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">Chat Settings</div>
     <div class="settings-section">
-      <div class="settings-item"><div class="settings-icon teal">✅</div><div class="settings-item-info"><div class="settings-item-title">Read Receipts</div><div class="settings-item-desc">Show when you have read messages</div></div><button class="settings-toggle on" id="rr-toggle-chats" onclick="toggleReadReceipts(this)"></button></div>
-      <div class="settings-item" onclick="if(confirm('Clear local cache? App will reload.')){{localStorage.clear();location.reload();}}"><div class="settings-icon orange">🧹</div><div class="settings-item-info"><div class="settings-item-title">Clear Cache</div><div class="settings-item-desc">Free up storage on device</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item"><div class="settings-icon teal">✅</div><div class="settings-item-info"><div class="settings-item-title">Read Receipts</div><div class="settings-item-desc">Show when messages are read</div></div><button class="settings-toggle on" id="rr-toggle-chats" onclick="toggleReadReceipts(this)"></button></div>
     </div>
   </div>
 </div>
@@ -3487,12 +3492,7 @@ window.doForgotPassword=async function(){
       <div class="settings-item"><div class="settings-icon green">📳</div><div class="settings-item-info"><div class="settings-item-title">Vibration</div><div class="settings-item-desc">Vibrate for new messages</div></div><button class="settings-toggle on" id="notif-toggle-vibration" onclick="toggleNotifPref(this,'vibration')"></button></div>
     </div>
     <div class="settings-section">
-      <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">Groups</div>
-      <div class="settings-item"><div class="settings-icon teal">👥</div><div class="settings-item-info"><div class="settings-item-title">Group Notifications</div><div class="settings-item-desc">Show notifications for groups</div></div><button class="settings-toggle on" id="notif-toggle-group" onclick="toggleNotifPref(this,'group')"></button></div>
-    </div>
-    <div class="settings-section">
-      <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">Browser Permission</div>
-      <div class="settings-item" onclick="requestNotifPermission()"><div class="settings-icon blue">🔔</div><div class="settings-item-info"><div class="settings-item-title">Enable Push Notifications</div><div class="settings-item-desc" id="notif-perm-status">Tap to request permission</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="window.requestNotifPermission&&requestNotifPermission()"><div class="settings-icon blue">🔔</div><div class="settings-item-info"><div class="settings-item-title">Enable Push Notifications</div><div class="settings-item-desc" id="notif-perm-status">Tap to request permission</div></div><div class="settings-item-right">›</div></div>
     </div>
   </div>
 </div>
@@ -3502,15 +3502,11 @@ window.doForgotPassword=async function(){
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('storage')">‹</button><h2>Storage and Data</h2></div>
   <div class="settings-body" style="padding:0">
     <div class="settings-section">
-      <div style="padding:16px" id="storage-info-box"><div style="color:var(--text2)">Loading storage info...</div></div>
+      <div style="padding:16px" id="storage-info-box"><div style="color:var(--text2)">Loading...</div></div>
     </div>
     <div class="settings-section">
-      <div style="padding:14px 16px 6px;font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.7px">Data Usage</div>
-      <div class="settings-item"><div class="settings-icon teal">📶</div><div class="settings-item-info"><div class="settings-item-title">Reduce Data Usage</div><div class="settings-item-desc">Lower quality media on mobile data</div></div><button class="settings-toggle" id="data-saver-toggle" onclick="this.classList.toggle('on');localStorage.setItem('data-saver',this.classList.contains('on')?'on':'off');toast('Data saver '+(this.classList.contains('on')?'on':'off'))"></button></div>
-      <div class="settings-item"><div class="settings-icon green">⬇️</div><div class="settings-item-info"><div class="settings-item-title">Auto-download on Wi-Fi</div><div class="settings-item-desc">Download media automatically</div></div><button class="settings-toggle on" id="auto-dl-toggle" onclick="this.classList.toggle('on');localStorage.setItem('auto-dl',this.classList.contains('on')?'on':'off')"></button></div>
-    </div>
-    <div class="settings-section">
-      <div class="settings-item" onclick="localStorage.clear();toast('Cache cleared ✅ Refresh to reload app')"><div class="settings-icon orange">🗑️</div><div class="settings-item-info"><div class="settings-item-title">Clear All Cache</div><div class="settings-item-desc">Removes all local app data</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item"><div class="settings-icon teal">📶</div><div class="settings-item-info"><div class="settings-item-title">Reduce Data Usage</div><div class="settings-item-desc">Lower quality on mobile data</div></div><button class="settings-toggle" id="data-saver-toggle" onclick="this.classList.toggle('on');localStorage.setItem('data-saver',this.classList.contains('on')?'on':'off');toast('Data saver '+(this.classList.contains('on')?'on':'off'))"></button></div>
+      <div class="settings-item" onclick="localStorage.clear();toast('Cache cleared ✅')"><div class="settings-icon orange">🗑️</div><div class="settings-item-info"><div class="settings-item-title">Clear Cache</div><div class="settings-item-desc">Remove local app data</div></div><div class="settings-item-right">›</div></div>
     </div>
   </div>
 </div>
@@ -3520,18 +3516,11 @@ window.doForgotPassword=async function(){
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('help')">‹</button><h2>Help</h2></div>
   <div class="settings-body" style="padding:0">
     <div class="settings-section">
-      <div class="settings-item" onclick="toast('FAQ coming soon')"><div class="settings-icon blue">❓</div><div class="settings-item-info"><div class="settings-item-title">FAQ</div><div class="settings-item-desc">Frequently asked questions</div></div><div class="settings-item-right">›</div></div>
-      <div class="settings-item" onclick="toast('Contact support: devgodswill@2k26dsa.app')"><div class="settings-icon teal">📧</div><div class="settings-item-info"><div class="settings-item-title">Contact Us</div><div class="settings-item-desc">Get help from the team</div></div><div class="settings-item-right">›</div></div>
-      <div class="settings-item" onclick="toast('Terms coming soon')"><div class="settings-icon grey">📄</div><div class="settings-item-info"><div class="settings-item-title">Terms and Privacy Policy</div></div><div class="settings-item-right">›</div></div>
-    </div>
-    <div style="padding:24px;text-align:center;color:#8696A0;font-size:12px;line-height:1.8">
-      <div style="font-size:15px;font-weight:700;color:#E9EDEF;margin-bottom:4px">2K26_DSA</div>
-      <div>Version 1.0.0</div>
-      <div style="margin-top:4px">Created by <span style="color:#25D366">DevGodswill</span></div>
+      <div class="settings-item" onclick="toast('📧 Contact: 2k26dsa@gmail.com')"><div class="settings-icon teal">📧</div><div class="settings-item-info"><div class="settings-item-title">Contact Us</div><div class="settings-item-desc">Get help from the 2k26_DSA team</div></div><div class="settings-item-right">›</div></div>
+      <div class="settings-item" onclick="toast('v2.0 — 2k26_DSA Chat App')"><div class="settings-icon green">ℹ️</div><div class="settings-item-info"><div class="settings-item-title">App Info</div><div class="settings-item-desc">Version 2.0 — 2k26_DSA</div></div><div class="settings-item-right">›</div></div>
     </div>
   </div>
 </div>
-
 
 <!-- FIND USER MODAL -->
 <div class="settings-sub" id="find-user-modal" style="background:#111B21;z-index:400">
@@ -3548,6 +3537,7 @@ window.doForgotPassword=async function(){
     <div id="find-user-results" style="display:flex;flex-direction:column;gap:2px"></div>
   </div>
 </div>
+
 
 </body>
 </html>
