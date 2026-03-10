@@ -681,6 +681,13 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 [data-theme="amoled"] .hmenu{background:#0A0A0A;border:1px solid #1A1A1A;}
 [data-theme="amoled"] .settings-item{border-bottom-color:#1A1A1A !important;}
 
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg, var(--bg2)) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
 </style>
 </head>
 <body>
@@ -1046,7 +1053,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
     </div>
 
     <!-- Stats row -->
-    <div id="profile-stats" style="display:flex;margin:14px 14px 0;gap:10px"></div>
+    <div id="profile-stats" style="display:flex;margin:14px 14px 0;gap:10px"><div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center;opacity:0.4"><div style="font-size:22px;margin-bottom:4px">👥</div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Friends</div></div><div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center;opacity:0.4"><div style="font-size:22px;margin-bottom:4px">📅</div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Joined</div></div></div>
 
     <!-- Edit fields card -->
     <div style="margin:14px 14px 0;background:var(--bg2);border-radius:14px;overflow:hidden">
@@ -1056,7 +1063,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
       </div>
       <div style="padding:14px 16px 0">
         <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Phone Number</div>
-        <input type="tel" id="edit-phone" style="width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:15px;outline:none;padding-bottom:12px" placeholder="+2348012345678"/>
+        <input type="tel" id="edit-phone" style="width:100%;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:inherit;font-size:15px;outline:none;padding-bottom:12px" autocomplete="tel" placeholder="+2348012345678"/>
       </div>
       <div style="padding:14px 16px 14px">
         <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">About / Status</div>
@@ -1240,6 +1247,7 @@ let msgSearchResults=[],msgSearchIdx=0;
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(msg,dur=2800,cb){
   const t=document.getElementById('toast');
+  if(!t)return;
   t.textContent=msg;t.classList.add('show');t.onclick=cb||null;
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
 }
@@ -1632,7 +1640,8 @@ document.addEventListener('click',e=>{
 window.openProfileEdit=function(){
   const overlay=document.getElementById('profile-overlay');
   if(!overlay)return;
-  // Fill avatar
+
+  // ── Avatar ──
   const prev=document.getElementById('edit-pfp-preview');
   if(prev){
     if(CUD&&CUD.pfp){
@@ -1644,49 +1653,59 @@ window.openProfileEdit=function(){
       prev.style.fontSize='38px';
     }
   }
-  // Display name + username in hero
+
+  // ── Name + username in hero ──
   const dn=document.getElementById('profile-display-name');
   const du=document.getElementById('profile-display-user');
   if(dn)dn.textContent=CUD&&CUD.name||'';
   if(du)du.textContent=CUD&&CUD.username?'@'+CUD.username:'';
-  // Editable fields
+
+  // ── Edit fields ──
   const en=document.getElementById('edit-name');
   const ep=document.getElementById('edit-phone');
   const es=document.getElementById('edit-status-text');
   if(en)en.value=CUD&&CUD.name||'';
   if(ep)ep.value=CUD&&CUD.phone||'';
   if(es)es.value=CUD&&CUD.statusText||'';
-  // Stats cards
+
+  // ── Stats (safe) ──
   const stats=document.getElementById('profile-stats');
   if(stats){
-    const friendCount=(CUD&&CUD.friends||[]).length;
-    const since=CUD&&CUD.createdAt&&CUD.createdAt.toDate
-      ?new Date(CUD.createdAt.toDate()).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'})
-      :'—';
+    let friendCount=0;
+    try{friendCount=Array.isArray(CUD?.friends)?CUD.friends.length:0;}catch(e){}
+    let since='—';
+    try{
+      if(CUD&&CUD.createdAt){
+        const d=CUD.createdAt.toDate?CUD.createdAt.toDate():new Date(CUD.createdAt);
+        since=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
+      }
+    }catch(e){}
     stats.innerHTML=[
       {icon:'👥',val:friendCount,label:'Friends'},
-      {icon:'📅',val:since,label:'Since'},
-    ].map(s=>`<div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center">
-      <div style="font-size:22px;margin-bottom:4px">${s.icon}</div>
-      <div style="font-size:20px;font-weight:800;color:var(--text)">${s.val}</div>
-      <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">${s.label}</div>
-    </div>`).join('');
+      {icon:'📅',val:since,label:'Joined'},
+    ].map(s=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center">'+
+      '<div style="font-size:22px;margin-bottom:4px">'+s.icon+'</div>'+
+      '<div style="font-size:20px;font-weight:800;color:var(--text)">'+s.val+'</div>'+
+      '<div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">'+s.label+'</div>'+
+    '</div>').join('');
   }
-  // Info card
+
+  // ── Info card (safe) ──
   const info=document.getElementById('profile-view-section');
   if(info){
     const email=CUD&&CUD.email||CU&&CU.email||'—';
     const uname=CUD&&CUD.username||'—';
-    info.innerHTML=`
-      <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
-        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Email</div>
-        <div style="color:var(--text);font-size:14px">${email}</div>
-      </div>
-      <div style="padding:14px 16px">
-        <div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Username</div>
-        <div style="color:var(--text);font-size:14px">@${uname}</div>
-      </div>`;
+    info.innerHTML=
+      '<div style="padding:14px 16px;border-bottom:1px solid var(--border)">'+
+        '<div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Email</div>'+
+        '<div style="color:var(--text);font-size:14px">'+email+'</div>'+
+      '</div>'+
+      '<div style="padding:14px 16px">'+
+        '<div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Username</div>'+
+        '<div style="color:var(--text);font-size:14px">@'+uname+'</div>'+
+      '</div>';
   }
+
   pendingEditPfpFile=null;
   hideErr('edit-err');
   overlay.classList.add('show');
@@ -1828,8 +1847,8 @@ function listenRequests(){
     const reqs=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderRequests(reqs);
     const badge=document.getElementById('req-badge');
-    if(reqs.length){badge.textContent=reqs.length;badge.classList.add('show');}
-    else badge.classList.remove('show');
+    if(reqs.length){if(badge){badge.textContent=reqs.length;badge.classList.add('show');}}
+    else if(badge)badge.classList.remove('show');
   });
 }
 function renderRequests(reqs){
@@ -2446,7 +2465,7 @@ window.createGroup=async function(){
   const name=document.getElementById('gc-name').value.trim();
   if(!name){showErr('gc-err','Group name required.');return;}
   const btn=document.querySelector('#gc-overlay .btn:not(.btn-ghost)');
-  btn.disabled=true;btn.textContent='Creating...';
+  if(btn){btn.disabled=true;btn.textContent='Creating...';}
   try{
     let icon='';
     if(pendingGcIconFile){icon=await uploadCloud(pendingGcIconFile,'group-icons');pendingGcIconFile=null;}
@@ -2463,7 +2482,7 @@ window.createGroup=async function(){
     });
     closeModal('gc-overlay');toast('"'+name+'" created! 🎉');openChat(gcDoc.id,'group');
   }catch(e){showErr('gc-err',e.message);}
-  finally{btn.disabled=false;btn.textContent='Create';}
+  finally{if(btn){btn.disabled=false;btn.textContent='Create';}}
 };
 
 // ── CHAT INFO + GROUP PERMISSIONS ──
@@ -2476,7 +2495,7 @@ window.openChatInfo=async function(){
     if(activeChatType==='group'){
       const snap=await getDoc(doc(db,'chats',activeChatId));
       const d=snap.data()||{};
-      title.textContent='Group';
+      if(title)title.textContent='Group';
       const isAdmin=d.admins?.includes(CU.uid);
       const perms=d.permissions||{membersCanSend:true,membersCanAddMembers:true};
       const inviteCode=d.inviteCode||activeChatId.slice(-8);
@@ -2569,7 +2588,7 @@ window.openChatInfo=async function(){
       const d=activeChatData||{};
       const other=d.members?.find(m=>m!==CU.uid);
       const od=d.memberData?.[other]||{};
-      title.textContent='Contact Info';
+      if(title)title.textContent='Contact Info';
       content.innerHTML=`<div style="text-align:center;padding:18px 0">
         ${od.pfp?`<img src="${od.pfp}" style="width:76px;height:76px;border-radius:50%;object-fit:cover;border:2.5px solid var(--accent)"/>`:`<div class="ci-av" style="width:76px;height:76px;font-size:28px;margin:0 auto">${(od.name||'?')[0]}</div>`}
         <div style="font-size:17px;font-weight:700;margin-top:12px">${esc(od.name||'')}</div>
@@ -2821,13 +2840,13 @@ async function showSVAt(i){
         const viewerIds=fresh.viewers||[];
         const storedNames=fresh.viewerNames||[];
         const cnt=viewerIds.length;
-        viewersEl.textContent=cnt+' viewer'+(cnt!==1?'s':'');
-        viewerNamesEl.textContent=storedNames.length>0?'Viewed by: '+storedNames.slice(0,5).join(', ')+(cnt>5?` +${cnt-5} more`:''):cnt>0?'Loading...':'No views yet';
+        if(viewersEl)viewersEl.textContent=cnt+' viewer'+(cnt!==1?'s':'');
+        if(viewerNamesEl)viewerNamesEl.textContent=storedNames.length>0?'Viewed by: '+storedNames.slice(0,5).join(', ')+(cnt>5?` +${cnt-5} more`:''):cnt>0?'Loading...':'No views yet';
       }
     }catch(e){viewersWrap.style.display='none';}
   }else{
     viewersWrap.style.display='none';
-    viewersEl.textContent='';viewerNamesEl.textContent='';
+    if(viewersEl)viewersEl.textContent='';if(viewerNamesEl)viewerNamesEl.textContent='';
     try{
       if(!(s.viewers||[]).includes(CU.uid)){
         await updateDoc(doc(db,'statuses',s.id),{viewers:arrayUnion(CU.uid),viewerNames:arrayUnion(CUD?.name||CU.displayName||'Someone')});
