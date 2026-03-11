@@ -1026,7 +1026,7 @@ input:-webkit-autofill:focus {
 </div>
 
 <!-- PROFILE PAGE (full screen dark like image 4) -->
-<div class="settings-page" id="profile-overlay" style="background:var(--bg);display:flex;flex-direction:column">
+<div class="settings-page" id="profile-overlay" style="background:var(--bg);flex-direction:column">
   <!-- Fixed top bar - OUTSIDE scroll, never overlapped -->
   <div style="display:flex;align-items:center;justify-content:space-between;padding:calc(14px + var(--safe-top)) 16px 12px;background:var(--header-bg);flex-shrink:0;position:relative;z-index:10">
     <button onclick="closeModal('profile-overlay')" style="background:var(--bg3);border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--text)">←</button>
@@ -1053,7 +1053,7 @@ input:-webkit-autofill:focus {
     </div>
 
     <!-- Stats row -->
-    <div id="profile-stats" style="display:flex;margin:14px 14px 0;gap:10px"></div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Friends</div></div><div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center;opacity:0.4"><div style="font-size:22px;margin-bottom:4px">📅</div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Joined</div></div></div>
+    <div id="profile-stats" style="display:flex;margin:14px 14px 0;gap:10px;width:calc(100% - 28px)"></div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Friends</div></div><div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center;opacity:0.4"><div style="font-size:22px;margin-bottom:4px">📅</div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Joined</div></div></div>
 
     <!-- Edit fields card -->
     <div style="margin:14px 14px 0;background:var(--bg2);border-radius:14px;overflow:hidden">
