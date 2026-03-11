@@ -85,16 +85,16 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* AUTH */
-#auth{display:none;position:fixed;inset:0;background:#075E54;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#auth{display:none;position:fixed;inset:0;background:var(--accent);z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #auth.show{display:block}
 .auth-card{width:100%;max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;animation:slideUp 0.4s ease}
-.auth-logo{text-align:center;background:#075E54;padding:40px 28px 32px;margin-bottom:0}
+.auth-logo{text-align:center;background:var(--accent);padding:40px 28px 32px;margin-bottom:0}
 .auth-logo img{width:72px;height:72px;border-radius:50%;border:2.5px solid rgba(255,255,255,0.5);margin-bottom:12px;object-fit:cover}
 .auth-logo h2{font-size:22px;font-weight:700;color:#fff;letter-spacing:1px}
 .auth-logo p{color:rgba(255,255,255,0.55);font-size:12px;margin-top:4px}
-.auth-body-wrap{background:#fff;flex:1;padding:24px 24px calc(40px + var(--safe-bot))}.auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:22px}
-.auth-tab{flex:1;padding:14px 10px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all 0.2s;border-bottom:2.5px solid transparent;margin-bottom:-2px}
-.auth-tab.active{color:#128C7E;border-bottom-color:#128C7E;background:transparent}
+.auth-body-wrap{background:var(--bg2);flex:1;padding:24px 24px calc(40px + var(--safe-bot))}.auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:22px}
+.auth-tab{flex:1;padding:16px 10px;min-height:48px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);user-select:none;transition:all 0.2s;border-bottom:2.5px solid transparent;margin-bottom:-2px}
+.auth-tab.active{color:var(--accent);border-bottom-color:#128C7E;background:transparent}
 .fg{margin-bottom:15px;position:relative}
 .fg label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px}
 .fg input{width:100%;padding:11px 14px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:all 0.2s}
@@ -1193,12 +1193,16 @@ input:-webkit-autofill:focus {
 <script>
 (function(){
   var _spStart=Date.now(),_spMinTime=1500;
+  // Only force-show auth if Firebase hasn't responded in 15s
   var t=setTimeout(function(){
     var sp=document.getElementById('splash');
     if(sp){sp.style.transition='opacity 0.3s';sp.style.opacity='0';setTimeout(function(){sp.style.display='none';},400);}
+    // Only show auth if main isn't already showing
+    var main=document.getElementById('main');
+    if(main&&main.contains('show'))return;
     var au=document.getElementById('auth');
     if(au){au.style.display='block';au.classList.add('show');}
-  },7000);
+  },15000);
   window._splashGuardian=t;
   window._spStart=_spStart;
   window._spMinTime=_spMinTime;
@@ -1210,7 +1214,8 @@ import {
   getAuth, createUserWiimport { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged, updateProfile, deleteUser, sendPasswordResetEmail
+  signOut, onAuthStateChanged, updateProfile, deleteUser, sendPasswordResetEmail,
+  setPersistence, browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
@@ -1229,6 +1234,8 @@ const FB={
 const CLOUD_NAME="dzxckgbzp",CLOUD_PRESET="Odegaard";
 const app=initializeApp(FB);
 const auth=getAuth(app);
+// Ensure auth persists across reloads
+try{setPersistence(auth,browserLocalPersistence).catch(()=>{});}catch(e){}
 const db=getFirestore(app);
 
 let CU=null,CUD=null;
@@ -3468,7 +3475,9 @@ window.doForgotPassword=async function(){
     toast('Password reset email sent! Check your inbox.',4000);
   }catch(e){showErr('login-err',e.message||'Failed to send reset email.');}
 };
+
 </script>
+
 
 <!-- PRIVACY SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-privacy">
