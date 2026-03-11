@@ -1047,13 +1047,13 @@ input:-webkit-autofill:focus {
       <input type="file" id="edit-pfp-file" accept="image/*" style="display:none" onchange="previewEditPfp(this)"/>
       <!-- Name + username -->
       <div style="text-align:center">
-        <div id="profile-display-name" style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.3px;text-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>
-        <div id="profile-display-user" style="font-size:13px;color:rgba(255,255,255,0.8);margin-top:2px;font-weight:600"></div>
+        <div id="profile-display-name" style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.3px;text-shadow:0 1px 4px rgba(0,0,0,0.3);min-height:28px"></div>
+        <div id="profile-display-user" style="font-size:13px;color:rgba(255,255,255,0.8);margin-top:2px;font-weight:600;min-height:18px"></div>
       </div>
     </div>
 
     <!-- Stats row -->
-    <div id="profile-stats" style="display:flex;margin:14px 14px 0;gap:10px"><div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center;opacity:0.4"><div style="font-size:22px;margin-bottom:4px">👥</div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Friends</div></div><div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center;opacity:0.4"><div style="font-size:22px;margin-bottom:4px">📅</div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Joined</div></div></div>
+    <div id="profile-stats" style="display:flex;margin:14px 14px 0;gap:10px"></div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Friends</div></div><div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center;opacity:0.4"><div style="font-size:22px;margin-bottom:4px">📅</div><div style="font-size:20px;font-weight:800;color:var(--text)">—</div><div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">Joined</div></div></div>
 
     <!-- Edit fields card -->
     <div style="margin:14px 14px 0;background:var(--bg2);border-radius:14px;overflow:hidden">
@@ -1206,6 +1206,8 @@ input:-webkit-autofill:focus {
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, createUserWiimport { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
   signOut, onAuthStateChanged, updateProfile, deleteUser, sendPasswordResetEmail
@@ -1637,64 +1639,90 @@ document.addEventListener('click',e=>{
 });
 
 // ── PROFILE ──
-window.openProfileEdit=function(){
+window.openProfileEdit=async function(){
   const overlay=document.getElementById('profile-overlay');
   if(!overlay)return;
+  overlay.classList.add('show');
+
+  // Fill from current CUD immediately (fast)
+  _fillProfileUI(CUD);
+
+  // Then re-fetch fresh from Firestore for accurate stats
+  try{
+    if(CU&&CU.uid){
+      const fresh=await getDoc(doc(db,'users',CU.uid));
+      if(fresh.exists()){
+        CUD={...fresh.data(),email:CU.email||fresh.data().email||''};
+        _fillProfileUI(CUD);
+      }
+    }
+  }catch(e){}
+};
+
+function _fillProfileUI(d){
+  if(!d)return;
 
   // ── Avatar ──
   const prev=document.getElementById('edit-pfp-preview');
   if(prev){
-    if(CUD&&CUD.pfp){
-      prev.innerHTML='<img src="'+CUD.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
+    if(d.pfp){
+      prev.innerHTML='<img src="'+d.pfp+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
       prev.style.fontSize='0';
     }else{
       prev.innerHTML='';
-      prev.textContent=(CUD&&CUD.name||'?')[0].toUpperCase();
+      prev.textContent=(d.name||'?')[0].toUpperCase();
       prev.style.fontSize='38px';
+      prev.style.color='#fff';
     }
   }
 
-  // ── Name + username in hero ──
+  // ── Hero name + username ──
   const dn=document.getElementById('profile-display-name');
   const du=document.getElementById('profile-display-user');
-  if(dn)dn.textContent=CUD&&CUD.name||'';
-  if(du)du.textContent=CUD&&CUD.username?'@'+CUD.username:'';
+  if(dn)dn.textContent=d.name||'';
+  if(du)du.textContent=d.username?'@'+d.username:'';
 
   // ── Edit fields ──
   const en=document.getElementById('edit-name');
   const ep=document.getElementById('edit-phone');
   const es=document.getElementById('edit-status-text');
-  if(en)en.value=CUD&&CUD.name||'';
-  if(ep)ep.value=CUD&&CUD.phone||'';
-  if(es)es.value=CUD&&CUD.statusText||'';
+  if(en)en.value=d.name||'';
+  if(ep)ep.value=d.phone||'';
+  if(es)es.value=d.statusText||'';
 
-  // ── Stats (safe) ──
+  // ── Stats ──
   const stats=document.getElementById('profile-stats');
   if(stats){
     let friendCount=0;
-    try{friendCount=Array.isArray(CUD?.friends)?CUD.friends.length:0;}catch(e){}
+    try{
+      if(Array.isArray(d.friends))friendCount=d.friends.length;
+      else if(d.friendCount)friendCount=d.friendCount;
+    }catch(e){}
     let since='—';
     try{
-      if(CUD&&CUD.createdAt){
-        const d=CUD.createdAt.toDate?CUD.createdAt.toDate():new Date(CUD.createdAt);
-        since=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
+      if(d.createdAt){
+        const dt=d.createdAt.toDate?d.createdAt.toDate():(d.createdAt.seconds?new Date(d.createdAt.seconds*1000):new Date(d.createdAt));
+        since=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
       }
     }catch(e){}
-    stats.innerHTML=[
-      {icon:'👥',val:friendCount,label:'Friends'},
-      {icon:'📅',val:since,label:'Joined'},
-    ].map(s=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center">'+
-      '<div style="font-size:22px;margin-bottom:4px">'+s.icon+'</div>'+
-      '<div style="font-size:20px;font-weight:800;color:var(--text)">'+s.val+'</div>'+
-      '<div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px">'+s.label+'</div>'+
-    '</div>').join('');
+    stats.innerHTML=
+      '<div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center">'+
+        '<div style="font-size:26px;margin-bottom:2px">👥</div>'+
+        '<div style="font-size:22px;font-weight:800;color:var(--text)">'+friendCount+'</div>'+
+        '<div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:2px">Friends</div>'+
+      '</div>'+
+      '<div style="flex:1;background:var(--bg2);border-radius:12px;padding:14px 10px;text-align:center">'+
+        '<div style="font-size:26px;margin-bottom:2px">📅</div>'+
+        '<div style="font-size:16px;font-weight:800;color:var(--text)">'+since+'</div>'+
+        '<div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-top:2px">Joined</div>'+
+      '</div>';
   }
 
-  // ── Info card (safe) ──
+  // ── Info card ──
   const info=document.getElementById('profile-view-section');
   if(info){
-    const email=CUD&&CUD.email||CU&&CU.email||'—';
-    const uname=CUD&&CUD.username||'—';
+    const email=d.email||CU&&CU.email||'—';
+    const uname=d.username||'—';
     info.innerHTML=
       '<div style="padding:14px 16px;border-bottom:1px solid var(--border)">'+
         '<div style="font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Email</div>'+
@@ -1708,8 +1736,7 @@ window.openProfileEdit=function(){
 
   pendingEditPfpFile=null;
   hideErr('edit-err');
-  overlay.classList.add('show');
-};
+}
 
 window.saveProfile=async function(){
   hideErr('edit-err');
@@ -3443,7 +3470,6 @@ window.doForgotPassword=async function(){
 };
 </script>
 
-
 <!-- PRIVACY SUB-PAGE -->
 <div class="settings-sub" id="settings-sub-privacy">
   <div class="settings-header"><button class="settings-back" onclick="closeSettingsSub('privacy')">‹</button><h2>Privacy</h2></div>
@@ -3556,6 +3582,7 @@ window.doForgotPassword=async function(){
     <div id="find-user-results" style="display:flex;flex-direction:column;gap:2px"></div>
   </div>
 </div>
+
 
 
 </body>
